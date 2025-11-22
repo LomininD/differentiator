@@ -32,7 +32,7 @@ struct tree
     node* root;
     size_t size;
     err_t err_stat;
-    // char* text_buf; // TODO - will be required if variables are multi-symbol
+    char* text_buf; // TODO - will be required if variables are multi-symbol
 };
 
 #endif

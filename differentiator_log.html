@@ -1,0 +1,134 @@
+<pre>
+<h3> +++ DIFFERENTIATOR LOG +++ </h3>
+
+tree_ctor: began initialising tree [0x16f773160]
+verification passed
+tree_ctor: finished initialising tree [0x16f773160]
+read_formula: process started
+read_formula: bytes in file: 57
+read_formula: bytes read:    57
+read_node: got '(', began reading node
+( + ( x nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+create_node: began creating node
+create_node: done creating node [0x103400b90]
+read_node: started reading node name
++ ( x nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: done reading node name
+read_node: read node string: +
+parse_node_data: process started
+parse_node_data: recognized operation +
+read_node: node name assigned
+( x nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: began reading left subtree
+( x nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: got '(', began reading node
+( x nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+create_node: began creating node
+create_node: done creating node [0x103400b50]
+read_node: started reading node name
+x nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: done reading node name
+read_node: read node string: x
+parse_node_data: process started
+parse_node_data: recognized variable name x
+read_node: node name assigned
+nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: began reading left subtree
+nil     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: got nil
+     nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: began reading right subtree
+nil) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: got nil
+) ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: node is read
+ ( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: began reading right subtree
+( + ( y nil nil ) ( 6 nil nil ) ) )
+read_node: got '(', began reading node
+( + ( y nil nil ) ( 6 nil nil ) ) )
+create_node: began creating node
+create_node: done creating node [0x103400b10]
+read_node: started reading node name
++ ( y nil nil ) ( 6 nil nil ) ) )
+read_node: done reading node name
+read_node: read node string: +
+parse_node_data: process started
+parse_node_data: recognized operation +
+read_node: node name assigned
+( y nil nil ) ( 6 nil nil ) ) )
+read_node: began reading left subtree
+( y nil nil ) ( 6 nil nil ) ) )
+read_node: got '(', began reading node
+( y nil nil ) ( 6 nil nil ) ) )
+create_node: began creating node
+create_node: done creating node [0x103400ad0]
+read_node: started reading node name
+y nil nil ) ( 6 nil nil ) ) )
+read_node: done reading node name
+read_node: read node string: y
+parse_node_data: process started
+parse_node_data: recognized variable name y
+read_node: node name assigned
+nil nil ) ( 6 nil nil ) ) )
+read_node: began reading left subtree
+nil nil ) ( 6 nil nil ) ) )
+read_node: got nil
+ nil ) ( 6 nil nil ) ) )
+read_node: began reading right subtree
+nil ) ( 6 nil nil ) ) )
+read_node: got nil
+ ) ( 6 nil nil ) ) )
+read_node: node is read
+ ( 6 nil nil ) ) )
+read_node: began reading right subtree
+( 6 nil nil ) ) )
+read_node: got '(', began reading node
+( 6 nil nil ) ) )
+create_node: began creating node
+create_node: done creating node [0x103400a90]
+read_node: started reading node name
+6 nil nil ) ) )
+read_node: done reading node name
+read_node: read node string: 6
+parse_node_data: process started
+parse_node_data: recognized number 6.000000
+read_node: node name assigned
+nil nil ) ) )
+read_node: began reading left subtree
+nil nil ) ) )
+read_node: got nil
+ nil ) ) )
+read_node: began reading right subtree
+nil ) ) )
+read_node: got nil
+ ) ) )
+read_node: node is read
+ ) )
+read_node: node is read
+ )
+read_node: node is read
+
+verification passed
+read_formula: process finished
+<b>======================= TREE DUMP =======================
+
+</b>Main tree view<b>
+tree [0x16f773160]
+
+</b>	err_stat   =  0 (0 - no_error, 1 - error)
+	size       =  5
+
+<b>=========================================================
+
+</b>
+
+ <img src="dump_img/0.svg"> 
+
+destroy_tree: began cutting down tree
+deleting 0x103400b90
+deleting 0x103400b50
+deleting 0x103400b10
+deleting 0x103400ad0
+deleting 0x103400a90
+destroy_tree: finished cutting down tree

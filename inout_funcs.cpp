@@ -113,10 +113,7 @@ char* request_string()
     }
 
     *strrchr(string, '\n') = '\0';
-    char* ans[10] = {};
-
-
-
+    
     printf_debug_msg("request_string: got \"%s\"\n", string);
 
     return string;

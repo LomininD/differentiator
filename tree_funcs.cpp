@@ -11,11 +11,11 @@ err_t tree_ctor(tree* tree)
         return error;
     }
 
-    printf_debug_msg("tree_ctor: began initialising tree [%p]", tree);
+    printf_debug_msg("tree_ctor: began initialising tree [%p]\n", tree);
 
     VERIFY_TREE(error);
 
-    printf_debug_msg("tree_ctor: finished initialising tree [%p]", tree);
+    printf_debug_msg("tree_ctor: finished initialising tree [%p]\n", tree);
     return ok;
 }
 
@@ -40,7 +40,7 @@ void destroy_tree(tree* tree)
     destroy_node(tree->root);
 
     tree->root = NULL;
-    //free(tree->text_buf);
+    free(tree->text_buf);
 
     printf_debug_msg("destroy_tree: finished cutting down tree\n");
 }

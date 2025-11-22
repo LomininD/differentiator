@@ -238,17 +238,36 @@ const node* list_nodes(FILE* fp, const node* current_node)
     FPRINT("<TABLE BORDER=\"0\" CELLBORDER=\"1\">");
 
     BEGIN_ROW;
+    FPRINT("<TD COLSPAN=\"2\">"); FPRINT("parent ="); PRINT_PTR(current_node->parent); FPRINT("</TD>");
+    END_ROW;
+
+    BEGIN_ROW;
     FPRINT("<TD COLSPAN=\"2\">"); FPRINT("ptr ="); PRINT_PTR(current_node); FPRINT("</TD>");
     END_ROW;
 
-    // BEGIN_ROW;
-    // FPRINT("<TD COLSPAN=\"2\">"); FPRINT("%s", current_node->string); FPRINT("</TD>");
-    // END_ROW;
+    BEGIN_ROW;
+    FPRINT("<TD COLSPAN=\"2\">"); 
+    switch (current_node->type)
+    {
+        case OP:
+            FPRINT("%s", decode_operation_type_enum(current_node->data.operation));
+            break;
+        case NUM:
+            FPRINT("%lf", current_node->data.number);
+            break;
+        case VAR:
+            FPRINT("%c", current_node->data.variable);
+            break;
+        default:
+            FPRINT("unknown");
+    };
+    FPRINT("</TD>");
+    END_ROW;
 
-    // BEGIN_ROW;
-    // FPRINT("<TD PORT=\"f0\">"); FPRINT("yes ["); PRINT_PTR(current_node->yes_branch); FPRINT("] </TD>");
-    // FPRINT("<TD PORT=\"f1\">"); FPRINT("no [");  PRINT_PTR(current_node->no_branch);  FPRINT("] </TD>");
-    // END_ROW;
+    BEGIN_ROW;
+    FPRINT("<TD PORT=\"f0\">"); FPRINT("yes ["); PRINT_PTR(current_node->left); FPRINT("] </TD>");
+    FPRINT("<TD PORT=\"f1\">"); FPRINT("no [");  PRINT_PTR(current_node->right);  FPRINT("] </TD>");
+    END_ROW;
 
     FPRINT("</TABLE>>, shape = plain, style = filled, fillcolor = \"#C0C0C0\", fontcolor = \"black\"]\n");
         
@@ -293,9 +312,9 @@ const char* decode_operation_type_enum(diff_ops op) // TODO - move to another fi
 {
     switch(op)
     {
-        case sum:
+        case ADD:
             return "+";
-        case sub:
+        case SUB:
             return "-";
         default:
             return "unknown operation";

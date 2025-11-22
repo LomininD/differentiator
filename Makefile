@@ -12,10 +12,12 @@ CPPFLAGS = -g0 -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wc++14-co
 
 BUILD = build
 
-SRCMODULES = tree_funcs.cpp akinator_funcs.cpp inout_funcs.cpp tree_dump.cpp
+SRCMODULES = tree_funcs.cpp differentiator_funcs.cpp inout_funcs.cpp tree_dump.cpp
 DEBUG_MODULE = debug_lib/debug.cpp
 OBJMODULES = $(addprefix $(BUILD)/,$(SRCMODULES:.cpp=.o)) 
 DEBUG_OBJ = $(addprefix $(BUILD)/,$(notdir $(DEBUG_MODULE:.cpp=.o)))
+
+all: $(BUILD) $(BUILD)/differntiator 
 
 $(BUILD)/differntiator: main.cpp $(OBJMODULES) $(DEBUG_OBJ)
 	$(CPP) $(CPPFLAGS) $^ -o $@
@@ -25,6 +27,9 @@ $(BUILD)/%.o: %.cpp
 
 $(BUILD)/%.o: debug_lib/%.cpp
 	$(CPP) $(CPPFLAGS) -c $< -o $@
+
+$(BUILD):
+	mkdir $(BUILD)
 
 deps.mk: $(SRCMODULES) $(DEBUG_MODULE)
 	$(CPP) -MM $^ > $@

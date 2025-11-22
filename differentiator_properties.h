@@ -8,14 +8,14 @@
 
 enum diff_ops
 {
-	unknown_op,
-	sum,
-	sub
+	UNKNOWN_OP,
+	ADD,
+	SUB
 };
 
 #include "debug_lib/debug.h"
 #include "tree_properties.h"
 
-#define SAVE_FILE_NAME "formula.txt" // TODO - remake as command line argument
+#define FORMULA_FILE_NAME "formula.txt" // TODO - remake as command line argument
 
 #endif
