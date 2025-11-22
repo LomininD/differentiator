@@ -3,3 +3,10 @@
 ===QUESTIONS===
 - In which order we have includes of debug.h?
 
+- [c]ount
+- [s]implify
+- [d]erivative
+- [p]artial derivative
+- [g]raph
+- [t]angent
+- [t]aylor polynomial

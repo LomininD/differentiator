@@ -265,8 +265,8 @@ const node* list_nodes(FILE* fp, const node* current_node)
     END_ROW;
 
     BEGIN_ROW;
-    FPRINT("<TD PORT=\"f0\">"); FPRINT("yes ["); PRINT_PTR(current_node->left); FPRINT("] </TD>");
-    FPRINT("<TD PORT=\"f1\">"); FPRINT("no [");  PRINT_PTR(current_node->right);  FPRINT("] </TD>");
+    FPRINT("<TD PORT=\"f0\">"); FPRINT("left ["); PRINT_PTR(current_node->left); FPRINT("] </TD>");
+    FPRINT("<TD PORT=\"f1\">"); FPRINT("right [");  PRINT_PTR(current_node->right);  FPRINT("] </TD>");
     END_ROW;
 
     FPRINT("</TABLE>>, shape = plain, style = filled, fillcolor = \"#C0C0C0\", fontcolor = \"black\"]\n");

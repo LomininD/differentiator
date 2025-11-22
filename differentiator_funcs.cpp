@@ -167,7 +167,7 @@ err_t read_formula(tree* tree)
 }
 
 
-node* read_node(char** current_pos, size_t* node_count) // TODO - symplify
+node* read_node(char** current_pos, size_t* node_count) // TODO - simplify
 {
     skip_spaces(current_pos);
     if (**current_pos == '(')
