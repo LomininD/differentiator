@@ -19,39 +19,9 @@ void print_menu()
 }
 
 
-// err_t save_database(const tree* tree)
-// {
-//     VERIFY_TREE(error);
-// 
-//     md_t debug_mode = tree->debug_mode;
-// 
-//     printf_log_msg(debug_mode, "save_database: began saving database\n");
-// 
-//     say_message(debug_mode, "-> Saving current version of database will overwrite saved version of it.\n", \
-//                             "Saving current version of database will overwrite saved version of it", NULL);
-//     say_message(debug_mode, "-> Save anyway? ([y]es / [n]o)\n", "Save anyway", NULL);
-// 
-//     ans_t ans = get_answer(debug_mode);
-//     err_t saved = ok; // FIXME - how to remove
-// 
-//     switch (ans)
-//     {
-//         case yes:
-//             saved = process_saving(tree);
-//             if (saved != ok) return saved;
-//             break;
-//         case no:
-//             break;
-//         default:
-//             return error;
-//     };
-// 
-//     printf_log_msg(debug_mode, "save_database: finished process\n");
-// 
-//     return ok;
-// }
-// 
-// 
+
+
+
 // err_t process_saving(const tree* tree)
 // {
 //     md_t debug_mode = tree->debug_mode;

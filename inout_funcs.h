@@ -5,9 +5,7 @@
 
 enum cmd_t
 {
-    guess,
-    save,
-    load,
+    calculate_derivative,
     quit,
 
     unknown

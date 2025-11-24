@@ -32,6 +32,8 @@ cmd_t get_cmd()
         {
             case 'q':
                 return quit;
+            case 'd':
+                return calculate_derivative;
             default:
                 printf_both("-> Could not recognize the answer, please try again:\n");
                 continue;

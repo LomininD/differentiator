@@ -10,6 +10,10 @@ static node* read_node(char** current_pos, size_t* node_count, err_t* read_error
 static err_t parse_node_data(node* new_node, char* string);
 static void skip_spaces(char** current_pos);
 
+static err_t process_operation(node* new_node, diff_ops op);
+static err_t process_number(node* new_node, double number, const char* end_of_str);
+static err_t process_variable(node* new_node, char* string);
+
 err_t read_formula(tree* tree)
 {
     printf_debug_msg("read_formula: process started\n");
@@ -150,33 +154,41 @@ err_t parse_node_data(node* new_node, char* string) // TODO - split into functio
 	assert (string != NULL);
 
 	printf_debug_msg("parse_node_data: process started\n");
+    err_t processed = ok;
 
 	if (strcmp(string, "+") == 0) // TODO - remove copy pasting
-	{
-		new_node->type = OP;
-		new_node->data.operation = ADD;
-
-		printf_debug_msg("parse_node_data: recognized operation %s\n", decode_operation_type_enum(ADD));
-
-		return ok;
-	}
+		processed = process_operation(new_node, ADD);
 	else if (strcmp(string, "-") == 0)
-	{
-		new_node->type = OP;
-		new_node->data.operation = SUB;
-
-		printf_debug_msg("parse_node_data: recognized operation %s\n", decode_operation_type_enum(SUB));
-
-		return ok;
-	}
+        processed = process_operation(new_node, SUB);
 
 	char* end_of_str = string;
 	double number = strtod(string, &end_of_str);
-	printf("%lf\n", number);
 
 	if (*end_of_str != *string)
-	{
-		if (number == HUGE_VAL)
+		processed = process_number(new_node, number, end_of_str);
+    else
+        processed = process_variable(new_node, string);
+    
+    if (processed != ok) return error;
+
+	return ok;
+}
+
+
+err_t process_operation(node* new_node, diff_ops op)
+{
+    new_node->type = OP;
+    new_node->data.operation = op;
+
+    printf_debug_msg("process_operation: recognized operation %s\n", decode_operation_type_enum(op));
+
+    return ok;
+}
+
+
+err_t process_number(node* new_node, double number, const char* end_of_str)
+{
+    if (number == HUGE_VAL)
 		{
 			printf_log_err("[from parse_node_data] -> number is too big\n");
 			return error;
@@ -195,20 +207,22 @@ err_t parse_node_data(node* new_node, char* string) // TODO - split into functio
 		new_node->type = NUM;
 		new_node->data.number = number;
 		return ok;
-	}
+}
 
-	if (strlen(string) != 1)
+
+err_t process_variable(node* new_node, char* string)
+{
+    if (strlen(string) != 1)
 	{
-		printf_log_err("[from parse_node_data] -> variable name is too big\n");
+		printf_log_err("[from process_variable] -> variable name is too big\n");
 		return error;
 	}
 
 	new_node->type = VAR;
 	new_node->data.variable = *string;
 
-	printf_debug_msg("parse_node_data: recognized variable name %s\n", string);
-
-	return ok;
+	printf_debug_msg("process_variable: recognized variable name %s\n", string);
+    return ok;
 }
 
 
