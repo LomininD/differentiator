@@ -30,12 +30,6 @@ cmd_t get_cmd()
 
         switch (ans)
         {
-            case 'g': 
-                return guess;
-            case 's':
-                return save;
-            case 'l':
-                return load;
             case 'q':
                 return quit;
             default:
@@ -113,7 +107,7 @@ char* request_string()
     }
 
     *strrchr(string, '\n') = '\0';
-    
+
     printf_debug_msg("request_string: got \"%s\"\n", string);
 
     return string;

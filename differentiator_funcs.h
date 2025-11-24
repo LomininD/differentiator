@@ -1,11 +1,11 @@
-#ifndef  DOFFERENTIATOR_FUNCS_H
-#define DOFFERENTIATOR_FUNCS_H
+#ifndef DIFFERENTIATOR_FUNCS_H
+#define DIFFERENTIATOR_FUNCS_H
 
+#include "differentiator_properties.h"
 #include "tree_funcs.h"
 #include "inout_funcs.h"
 
-err_t read_formula(tree* tree);
-
+void print_menu();
 cmd_t request_cmd(const tree* tree);
 err_t request_tree_beginning(tree* tree);
 err_t request_new_nodes(tree* tree, node* parent_node);

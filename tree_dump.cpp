@@ -253,7 +253,7 @@ const node* list_nodes(FILE* fp, const node* current_node)
             FPRINT("%s", decode_operation_type_enum(current_node->data.operation));
             break;
         case NUM:
-            FPRINT("%lf", current_node->data.number);
+            FPRINT("%lf", current_node->data.number); // TODO - if number is int remove .00000
             break;
         case VAR:
             FPRINT("%c", current_node->data.variable);
