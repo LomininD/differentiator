@@ -8,5 +8,5 @@
 - [d]erivative
 - [p]artial derivative
 - [g]raph
-- [t]angent
+- t[a]ngent
 - [t]aylor polynomial

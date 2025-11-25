@@ -238,11 +238,11 @@ const node* list_nodes(FILE* fp, const node* current_node)
     FPRINT("<TABLE BORDER=\"0\" CELLBORDER=\"1\">");
 
     BEGIN_ROW;
-    FPRINT("<TD COLSPAN=\"2\">"); FPRINT("parent ="); PRINT_PTR(current_node->parent); FPRINT("</TD>");
+    FPRINT("<TD COLSPAN=\"2\">"); FPRINT("parent ["); PRINT_PTR(current_node->parent); FPRINT("] </TD>");
     END_ROW;
 
     BEGIN_ROW;
-    FPRINT("<TD COLSPAN=\"2\">"); FPRINT("ptr ="); PRINT_PTR(current_node); FPRINT("</TD>");
+    FPRINT("<TD COLSPAN=\"2\">"); FPRINT("ptr ["); PRINT_PTR(current_node); FPRINT("] </TD>");
     END_ROW;
 
     BEGIN_ROW;
