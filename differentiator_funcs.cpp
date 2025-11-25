@@ -7,6 +7,7 @@
 // static err_t process_saving(const tree* tree);
 // static err_t process_loading(tree* tree);
 static tree* differentiate_tree(tree* tree_ptr, char diff_var);
+node* diff_node(tree* tree_ptr);
 
 
 void print_menu()
@@ -43,7 +44,14 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 		CHECK_ERR;
 	}
 
-	
+	// dump_to_tex
+
+	printf_debug_msg("process_calculating_partial_derivative: cleaning up tree_ptr_arr\n");
+
+	for (int i = 1; i <= diff_times; i++) // TODO - delete in dtor in case user needs to count another derivative
+	{
+		if (tree_ptr_arr[i] != NULL) free(tree_ptr_arr[i]);
+	}
 
 	printf_debug_msg("process_calculating_partial_derivative: finished process\n");
 	return ok;
@@ -58,13 +66,19 @@ tree* differentiate_tree(tree* tree_ptr, char diff_var)
 	tree* new_tree_ptr = tree_ctor();
 	if (new_tree_ptr == NULL) return NULL;
 
+	node* diffed_root_node = diff_node(tree_ptr);
 
+	new_tree_ptr->size += 1;
 
-
-
+	VERIFY_TREE(tree_ptr, NULL);
 	printf_debug_msg("differentiate_tree: finished process\n");
 
 	return new_tree_ptr;
+}
+
+node* diff_node(tree* tree_ptr)
+{
+	return NULL;
 }
 
 
