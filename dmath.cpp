@@ -71,7 +71,7 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 			diffed_node_ptr =  differentiate_add_sub(tree_ptr, current_node_ptr, diff_var, SUB);
 			break;
 		case MUL:
-			// differentiate_mul()
+			diffed_node_ptr = differentiate_mul(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case DIV:
 			// differentiate_div()

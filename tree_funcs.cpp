@@ -24,19 +24,56 @@ tree* tree_ctor()
 }
 
 
+#define create_copy(data)                                                   \
+            create_and_initialise_node(original_node_ptr->type, data,       \
+            copy_node(tree_ptr, original_node_ptr->left),                   \
+            copy_node(tree_ptr, original_node_ptr->right), NULL);           \
+
+
+
 node* copy_node(tree* tree_ptr, node* original_node_ptr)
 {
     printf_debug_msg("copy_node: began process\n");
 
-    node* copied_node_ptr = create_and_initialise_node(original_node_ptr->type,             \
-            original_node_ptr->data, copy_node(tree_ptr, original_node_ptr->left),          \
-                                     copy_node(tree_ptr, original_node_ptr->right), NULL);
+    if (original_node_ptr == NULL) return NULL;
+
+    printf("ok\n");
+
+    node* copied_node_ptr = NULL;
+
+    switch(original_node_ptr->type)
+    {
+        case OP:
+            copied_node_ptr = create_copy((union data_t){.operation = original_node_ptr->data.operation});
+            printf("%d\n", (union data_t){.operation = original_node_ptr->data.operation}.operation);
+            printf("OP\n");
+            printf("%d\n", copied_node_ptr->data.operation);
+            break;
+        case NUM:
+            copied_node_ptr = create_copy((union data_t){.number = original_node_ptr->data.number});
+            printf("%d\n", (union data_t){.number = original_node_ptr->data.number}.number);
+            printf("NUM\n");
+            printf("%d\n", copied_node_ptr->data.number);
+            break;
+        case VAR:
+            copied_node_ptr = create_copy((union data_t){.variable = original_node_ptr->data.variable});
+            printf("%c\n", (union data_t){.variable = original_node_ptr->data.variable}.variable);
+            printf("VAR\n");
+            printf("%c\n", copied_node_ptr->data.variable);
+            break;
+        default:
+            printf("aaaaaa\n");
+            return NULL;
+    };
 
     tree_ptr->size++;
+    printf("CREATED_COPY %p\n", copied_node_ptr);
 
     printf_debug_msg("copy_node: finished process\n");
     return copied_node_ptr;
 }
+
+#undef create_copy
 
 
 node* create_node()

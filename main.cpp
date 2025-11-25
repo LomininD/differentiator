@@ -35,7 +35,19 @@ int main()
         };
     }
 
+
+    node* cn = copy_node(main_tree_ptr, main_tree_ptr->root);
+    printf("root %p\n", main_tree_ptr->root);
+    printf("CN %p\n", cn);
+
+    tree* copied_tree = tree_ctor();
+    copied_tree->root = cn;
+    copied_tree->size = 0;
+
+    print_tree_dump(copied_tree, "copied tree\n");
+
     destroy_tree(main_tree_ptr);
+    destroy_tree(copied_tree);
     end_debugging();
     return 0;
 }
