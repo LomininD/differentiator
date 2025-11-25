@@ -105,12 +105,14 @@ err_t process_tree_verification(const tree* tree)
     switch (verified)
     {
         case null_data:
-            printf(MAKE_BOLD_RED("verification failed") "not enough data to show additional information\n");
+            printf_log_err("verification failed not enough data to show additional information\n");
+            global_err_stat = error;
             return error;
             break;
         case error:
             printf_log_err("verification failed\n"); 
             print_tree_dump(tree, "Verification failed\n");
+            global_err_stat = error;
             return error;
             break;
         case ok:

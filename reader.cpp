@@ -44,7 +44,7 @@ err_t read_formula(tree* tree_ptr)
 	VERIFY_TREE(tree_ptr, error);
 
     printf_debug_msg("read_formula: process finished\n");
-	print_tree_dump(tree_ptr, "Read formula tree view");
+	print_tree_dump(tree_ptr, "Read formula tree view\n");
 
     return ok;
 }

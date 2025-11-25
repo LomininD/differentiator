@@ -1,4 +1,5 @@
 #include "differentiator_funcs.h"
+#include "dmath.h"
 #include <stdlib.h>
 #include <assert.h>
 
@@ -6,19 +7,19 @@
 // static void write_node(FILE* save_ptr, const tree* tree, const node* current_node);
 // static err_t process_saving(const tree* tree);
 // static err_t process_loading(tree* tree);
-static tree* differentiate_tree(tree* tree_ptr, char diff_var);
-node* differentiate_node(tree* tree_ptr, node* current_node_ptr);
+static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
+node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
 
 
 void print_menu()
 {
 	printf_both("-> Choose a command to execute:\n");
-	printf("- [c]ount\n");
-	printf("- [s]implify\n");
-	printf("- [d]erivative\n");
+	printf("- [c]ount (not done yet)\n");
+	printf("- [s]implify (not done yet)\n");
+	printf("- [d]erivative (not done yet)\n");
 	printf("- [p]artial derivative\n");
-	printf("- [g]raph\n");
-	printf("- [t]aylor polynomial\n");
+	printf("- [g]raph (not done yet)\n");
+	printf("- [t]aylor polynomial (not done yet)\n");
 	printf("- [q]uit\n");
 }
 
@@ -42,17 +43,21 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 	{
 		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
 		CHECK_ERR(error);
+
+		print_tree_dump(tree_ptr_arr[i], "Differentiated tree view (%d)\n", i);
+		// dump_to_tex
+
 	}
-
-	// dump_to_tex
 	
-	print_tree_dump(tree_ptr_arr[diff_times], "Differentiated tree view");
-
 	printf_debug_msg("process_calculating_partial_derivative: cleaning up tree_ptr_arr\n");
 
 	for (int i = 1; i <= diff_times; i++) // TODO - delete in dtor in case user needs to count another derivative
 	{
-		if (tree_ptr_arr[i] != NULL) free(tree_ptr_arr[i]);
+		if (tree_ptr_arr[i] != NULL) 
+		{
+			printf_debug_msg("cleaning %p\n", tree_ptr_arr[i]);
+			destroy_tree(tree_ptr_arr[i]); 
+		}
 	}
 
 	printf_debug_msg("process_calculating_partial_derivative: finished process\n");
@@ -60,26 +65,28 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 }
 
 
-tree* differentiate_tree(tree* tree_ptr, char diff_var)
+tree* differentiate_tree(const tree* old_tree_ptr, char diff_var)
 {
-	assert(tree_ptr != NULL);
+	assert(old_tree_ptr != NULL);
 	printf_debug_msg("differentiate_tree: began process\n");
 
 	tree* new_tree_ptr = tree_ctor();
 	if (new_tree_ptr == NULL) return NULL;
 
-	node* diffed_root_node = differentiate_node(tree_ptr, tree_ptr->root);
+	node* diffed_root_node = differentiate_node(new_tree_ptr, old_tree_ptr->root, diff_var);
 	CHECK_ERR(NULL);
 
-	new_tree_ptr->size += 1;
+	diffed_root_node->parent = NULL;
 
-	VERIFY_TREE(tree_ptr, NULL);
+	new_tree_ptr->root = diffed_root_node;
+
+	VERIFY_TREE(new_tree_ptr, NULL);
 	printf_debug_msg("differentiate_tree: finished process\n");
 
 	return new_tree_ptr;
 }
 
-node* differentiate_node(tree* tree_ptr, node* current_node_ptr)
+node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	assert(tree_ptr != NULL);
 	assert(current_node_ptr != NULL);
@@ -89,10 +96,10 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr)
 	switch(current_node_ptr->type)
 	{
 		case NUM:
-			// differentiate_number_node()
+			diffed_node = differentiate_number_node(tree_ptr, current_node_ptr);
 			break;
 		case VAR:
-			// differentiate_var_node()
+			diffed_node  = differentiate_var_node(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case OP:
 			// differentiate_op_node()

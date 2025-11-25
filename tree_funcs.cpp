@@ -81,6 +81,7 @@ void destroy_tree(tree* tree_ptr)
 
     tree_ptr->root = NULL;
     free(tree_ptr->text_buf);
+    free(tree_ptr);
 
     printf_debug_msg("destroy_tree: finished cutting down tree\n");
 }
