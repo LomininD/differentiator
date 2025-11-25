@@ -65,11 +65,10 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 	switch(current_node_ptr->data.operation) // TODO - optimize
 	{
 		case ADD:
-			diffed_node_ptr =  differentiate_add(tree_ptr, current_node_ptr, diff_var);
-			printf("left: %p right: %p\n", diffed_node_ptr->left, diffed_node_ptr->right);
+			diffed_node_ptr =  differentiate_add_sub(tree_ptr, current_node_ptr, diff_var, ADD);
 			break;
 		case SUB:
-			// differentiate_sub()
+			diffed_node_ptr =  differentiate_add_sub(tree_ptr, current_node_ptr, diff_var, SUB);
 			break;
 		case MUL:
 			// differentiate_mul()
@@ -85,31 +84,34 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 
 
 #define d(NODE_PTR) differentiate_node(tree_ptr, NODE_PTR, diff_var)
-#define c(NODE_PTR) copy_node(NODE_PTR)
+#define c(NODE_PTR) copy_node(tree_ptr, NODE_PTR)
 #define l_subtr current_node_ptr->left
 #define r_subtr current_node_ptr->right
+#define to_op(CMD) (union data_t){.operation = CMD}
+#define nn(...) create_and_initialise_node(__VA_ARGS__)
 
 
-node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var)
+node* differentiate_add_sub(tree* tree_ptr, node* current_node_ptr, char diff_var, diff_ops op)
 {
 	assert(tree_ptr != NULL);
 	assert(current_node_ptr != NULL);
 
-	data_t mid_node_data;
-	mid_node_data.operation = ADD;
-
-	node* left = d(l_subtr);
-	node* right = d(r_subtr);
-
-	node* diffed_node_ptr = create_and_initialise_node(OP, mid_node_data, right, left, NULL);
-
-	left->parent = right->parent = diffed_node_ptr;
 	tree_ptr->size += 1;
+	return nn(OP, to_op(op), d(l_subtr), d(r_subtr), NULL);
+}
 
-	return diffed_node_ptr;
+node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node_ptr != NULL);
+
+	tree_ptr->size += 3;
+	return nn(OP, to_op(ADD), nn(OP, to_op(MUL), d(l_subtr), c(r_subtr), NULL), \
+							  nn(OP, to_op(MUL), c(l_subtr), d(r_subtr), NULL), NULL);
 }
 
 #undef d
 #undef c
 #undef l_subtr
 #undef r_subtr
+#undef to_op

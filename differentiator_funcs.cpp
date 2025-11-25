@@ -74,8 +74,6 @@ tree* differentiate_tree(const tree* old_tree_ptr, char diff_var)
 	node* diffed_root_node = differentiate_node(new_tree_ptr, old_tree_ptr->root, diff_var);
 	CHECK_ERR(NULL);
 
-	diffed_root_node->parent = NULL;
-
 	new_tree_ptr->root = diffed_root_node;
 
 	VERIFY_TREE(new_tree_ptr, NULL);

@@ -24,16 +24,19 @@ tree* tree_ctor()
 }
 
 
-// node* copy_node(node* original_node_ptr)
-// {
-//     printf_debug_msg("copy_node: began process\n");
-// 
-//     node* copied_node_ptr = create_and_initialise_node(original_node_ptr->type, original_node_ptr->data, \
-//                                                                                     NULL, NULL, NULL);
-// 
-//     printf_debug_msg("copy_node: finished process\n");
-//     return copied_node_ptr;
-// }
+node* copy_node(tree* tree_ptr, node* original_node_ptr)
+{
+    printf_debug_msg("copy_node: began process\n");
+
+    node* copied_node_ptr = create_and_initialise_node(original_node_ptr->type,             \
+            original_node_ptr->data, copy_node(tree_ptr, original_node_ptr->left),          \
+                                     copy_node(tree_ptr, original_node_ptr->right), NULL);
+
+    tree_ptr->size++;
+
+    printf_debug_msg("copy_node: finished process\n");
+    return copied_node_ptr;
+}
 
 
 node* create_node()
@@ -73,6 +76,9 @@ node* create_and_initialise_node(node_t type, union data_t data, node* left, nod
         default:
             printf_log_err("[from copy_node] -> could not recognize type of node\n");
     };
+
+    if (left != NULL) left->parent = new_node_ptr;
+    if (right != NULL) right->parent = new_node_ptr;
 
     new_node_ptr->left = left;
     new_node_ptr->right = right;
