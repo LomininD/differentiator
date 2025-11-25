@@ -23,52 +23,67 @@ tree* tree_ctor()
     return tree_ptr;
 }
 
-#define original_node_data original_node_ptr->data
-#define copied_node_data copied_node_ptr->data
 
-node* copy_node(node* original_node_ptr)
-{
-    printf_debug_msg("copy_node: began process\n");
-
-    node* copied_node_ptr = create_node();
-
-    node_t type = original_node_ptr->type;
-    copied_node_ptr->type = type;
-
-    switch(type)
-    {
-        case OP:
-            copied_node_data.operation = original_node_data.operation;
-            break;
-        case VAR:
-            copied_node_data.variable = original_node_data.variable;
-            break;
-        case NUM:
-            copied_node_data.number = original_node_data.number;
-            break;
-        default:
-            printf_log_err("[from copy_node] -> could not recognize type of original node [%p]\n", original_node_ptr);
-    };
-
-    printf_debug_msg("copy_node: finished process\n");
-    return copied_node_ptr;
-}
-
-#undef original_node_data
-#undef copied_node_data
+// node* copy_node(node* original_node_ptr)
+// {
+//     printf_debug_msg("copy_node: began process\n");
+// 
+//     node* copied_node_ptr = create_and_initialise_node(original_node_ptr->type, original_node_ptr->data, \
+//                                                                                     NULL, NULL, NULL);
+// 
+//     printf_debug_msg("copy_node: finished process\n");
+//     return copied_node_ptr;
+// }
 
 
 node* create_node()
 {
     printf_debug_msg("create_node: began creating node\n");
 
-    node* new_node = (node*) calloc(1, sizeof(node));
+    node* new_node_ptr = (node*) calloc(1, sizeof(node));
 
-    assert(new_node != NULL);
+    assert(new_node_ptr != NULL);
 
-    printf_debug_msg("create_node: done creating node [%p]\n", new_node);
-    return new_node;
+    printf_debug_msg("create_node: done creating node [%p]\n", new_node_ptr);
+    return new_node_ptr;
 }
+
+
+#define node_data new_node_ptr->data
+
+node* create_and_initialise_node(node_t type, union data_t data, node* left, node* right, node* parent)
+{
+    printf_debug_msg("create_and_initialise_node: began process\n");
+
+    node* new_node_ptr = create_node();
+
+    new_node_ptr->type = type;
+
+    switch(type)
+    {
+        case OP:
+            node_data.operation = data.operation;
+            break;
+        case VAR:
+            data.variable = data.variable;
+            break;
+        case NUM:
+            node_data.number = data.number;
+            break;
+        default:
+            printf_log_err("[from copy_node] -> could not recognize type of node\n");
+    };
+
+    new_node_ptr->left = left;
+    new_node_ptr->right = right;
+    new_node_ptr->parent = parent;
+
+    printf_debug_msg("create_and_initialise_node: finished process\n");
+
+    return new_node_ptr;
+}
+
+#undef node_data
 
 
 void destroy_tree(tree* tree_ptr)

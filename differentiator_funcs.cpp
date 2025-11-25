@@ -8,7 +8,6 @@
 // static err_t process_saving(const tree* tree);
 // static err_t process_loading(tree* tree);
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
-node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
 
 
 void print_menu()
@@ -46,7 +45,6 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 
 		print_tree_dump(tree_ptr_arr[i], "Differentiated tree view (%d)\n", i);
 		// dump_to_tex
-
 	}
 	
 	printf_debug_msg("process_calculating_partial_derivative: cleaning up tree_ptr_arr\n");
@@ -91,6 +89,9 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	assert(tree_ptr != NULL);
 	assert(current_node_ptr != NULL);
 
+	printf_debug_msg("differentiate_node: began process\n");
+	printf("type = %d (%d)\n", current_node_ptr->type, OP);
+
 	node* diffed_node = NULL;
 
 	switch(current_node_ptr->type)
@@ -102,7 +103,7 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 			diffed_node  = differentiate_var_node(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case OP:
-			// differentiate_op_node()
+			diffed_node = differentiate_op_node(tree_ptr, current_node_ptr, diff_var);
 			break;
 		default:
 			printf_log_err("[from differentiate_node] -> unknown node [%p] type\n", current_node_ptr);
@@ -111,6 +112,9 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	};
 
 	CHECK_ERR(NULL);
+
+	printf_debug_msg("differentiate_node: finished process\n");
+
 	return diffed_node;
 }
 

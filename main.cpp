@@ -2,6 +2,7 @@
 #include "differentiator_funcs.h"
 #include "tree_funcs.h"
 #include "reader.h"
+#include <stdlib.h>
 
 
 int main()

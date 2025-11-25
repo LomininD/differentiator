@@ -1,5 +1,6 @@
 #include "dmath.h"
 #include <assert.h>
+#include "differentiator_funcs.h"
 
 
 #define check_for_mem_err(FUNC) { 															\
@@ -21,6 +22,7 @@ node* differentiate_number_node(tree* tree_ptr, node* current_node_ptr)
 	check_for_mem_err("differentiate_number_node");
 
 	tree_ptr->size += 1;
+	
 	diffed_node_ptr->type = NUM;
 
 	diffed_node_ptr->data.number = 0;
@@ -52,3 +54,62 @@ node* differentiate_var_node(tree* tree_ptr, node* current_node_ptr, char diff_v
 
 	return diffed_node_ptr;
 }
+
+
+node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node_ptr != NULL);
+	node* diffed_node_ptr = NULL;
+
+	switch(current_node_ptr->data.operation) // TODO - optimize
+	{
+		case ADD:
+			diffed_node_ptr =  differentiate_add(tree_ptr, current_node_ptr, diff_var);
+			printf("left: %p right: %p\n", diffed_node_ptr->left, diffed_node_ptr->right);
+			break;
+		case SUB:
+			// differentiate_sub()
+			break;
+		case MUL:
+			// differentiate_mul()
+			break;
+		case DIV:
+			// differentiate_div()
+			break;
+		default:
+	};
+
+	return diffed_node_ptr;
+}
+
+
+#define d(NODE_PTR) differentiate_node(tree_ptr, NODE_PTR, diff_var)
+#define c(NODE_PTR) copy_node(NODE_PTR)
+#define l_subtr current_node_ptr->left
+#define r_subtr current_node_ptr->right
+
+
+node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node_ptr != NULL);
+
+	data_t mid_node_data;
+	mid_node_data.operation = ADD;
+
+	node* left = d(l_subtr);
+	node* right = d(r_subtr);
+
+	node* diffed_node_ptr = create_and_initialise_node(OP, mid_node_data, right, left, NULL);
+
+	left->parent = right->parent = diffed_node_ptr;
+	tree_ptr->size += 1;
+
+	return diffed_node_ptr;
+}
+
+#undef d
+#undef c
+#undef l_subtr
+#undef r_subtr

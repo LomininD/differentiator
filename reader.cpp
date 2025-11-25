@@ -88,7 +88,7 @@ err_t read_text_buf(FILE* file_ptr, char** text_buf_ptr)
 }
 
 
-node* read_node(char** current_pos, size_t* node_count, err_t* read_error)
+node* read_node(char** current_pos, size_t* node_count, err_t* read_error) // TODO - optimize
 {
     skip_spaces(current_pos);
     if (**current_pos == '(')
@@ -177,9 +177,25 @@ err_t parse_node_data(node* new_node, char* string) // TODO - split into functio
     err_t processed = ok;
 
 	if (strcmp(string, "+") == 0) // TODO - remove copy pasting
+    {
 		processed = process_operation(new_node, ADD);
+        return processed;
+    }
 	else if (strcmp(string, "-") == 0)
+    {
         processed = process_operation(new_node, SUB);
+        return processed;
+    }
+    else if (strcmp(string, "*") == 0)
+    {
+        processed = process_operation(new_node, MUL);
+        return processed;
+    }
+    else if (strcmp(string, "/") == 0)
+    {
+        processed = process_operation(new_node, DIV);
+        return processed;
+    }
 
 	char* end_of_str = string;
 	double number = strtod(string, &end_of_str);

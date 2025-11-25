@@ -6,11 +6,14 @@
 #define TREE_VERIFICATION
 //#define ADVERTISEMENTS
 
-enum diff_ops
+// TODO - move to other file
+enum diff_ops // decode_operation_type_enum | parse_node_data | enum
 {
 	UNKNOWN_OP,
 	ADD,
-	SUB
+	SUB,
+	MUL,
+	DIV
 };
 
 #include "debug_lib/debug.h"

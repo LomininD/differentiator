@@ -318,6 +318,10 @@ const char* decode_operation_type_enum(diff_ops op) // TODO - move to another fi
             return "+";
         case SUB:
             return "-";
+        case MUL:
+            return "*";
+        case DIV:
+            return "/";
         default:
             return "unknown operation";
     };
