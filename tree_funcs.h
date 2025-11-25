@@ -6,21 +6,21 @@
 
 
 node* create_node();
-err_t tree_ctor(tree* tree);
+tree* tree_ctor();
 void destroy_tree(tree* tree);
 void destroy_node(node* node);
 
 
 #ifdef TREE_VERIFICATION
 
-#define VERIFY_TREE(RET) if (process_tree_verification(tree) != ok)  return RET;
+#define VERIFY_TREE(TREE_PTR, RET) if (process_tree_verification(TREE_PTR) != ok)  return RET
+#define DISPLAY_TREE(TREE_PTR) generate_dump_image(TREE_PTR)
 
 #else
 
-# define VERIFY_TREE(RET) if (tree == NULL) return RET;
+# define VERIFY_TREE(TREE_PTR, RET) if (TREE_PTR == NULL) return RET
+#define DISPLAY_TREE() 
 
 #endif
-
-#define DISPLAY_TREE() if (debug_mode == on) generate_dump_image(tree);
 
 #endif

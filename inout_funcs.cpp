@@ -3,7 +3,7 @@
 #include <string.h>
 #include "inout_funcs.h"
 
-static bool check_ans(char* ans);
+
 static void clear_buffer(void);
 static bool check_buffer();
 
@@ -34,6 +34,8 @@ cmd_t get_cmd()
                 return quit;
             case 'd':
                 return calculate_derivative;
+            case 'p':
+                return calculate_partial_derivative;
             default:
                 printf_both("-> Could not recognize the answer, please try again:\n");
                 continue;
@@ -41,6 +43,55 @@ cmd_t get_cmd()
     }
 
     return unknown;
+}
+
+
+char get_var_name()
+{
+    bool got_ans = false;
+    char* var = NULL;
+
+    while (!got_ans)
+    {
+        var = request_string();
+        if (strlen(var) != 1)
+        {
+            printf_both("-> variable name is too big, please try again\n");
+            continue;
+        }
+        got_ans = true;
+    }
+
+    char var_name = var[0]; // TODO - change for multi-char vars
+    free(var);
+
+    return var_name;
+}
+
+
+int get_number()
+{
+    bool got_ans = false;
+    int ans = 0;
+
+    while (!got_ans)
+    {
+        char left_s = 0;
+        int scanned = scanf("%d", &ans);
+
+        printf_debug_msg("got %d\n", ans);
+
+        if (scanned != 1 || !check_buffer())
+        {
+            printf_both("-> Could not recognize the answer, please try again:\n");
+            clear_buffer();
+            continue;
+        }
+
+        got_ans = true;
+    }
+
+    return ans;
 }
 
 
@@ -87,25 +138,20 @@ char* request_string()
 
     if (string == NULL)
     {
-        printf_log_err("[from request_string] -> could not allocate memory for node data\n");
+        printf_log_err("[from request_string] -> could not allocate memory for the string\n");
         return NULL;
     }
 
     size_t string_len = 0;
-    int read = 0;
-
-    printf("Hello world");
-
-
-
+    ssize_t read = 0;
 
     read = getline(&string, &string_len, stdin);
     
-    while (read <= 0 || !check_ans(string))
+    while (read <= 0)
     {
-        printf_both("-> Bad answer (got nothing or got \"not\" in the answer), please try again\n");
+        printf_both("-> Bad answer (got nothing), please try again\n");
         clearerr(stdin);
-        read = getline(&string, &string_len, stdin); // clear_buffer()?
+        read = getline(&string, &string_len, stdin);
     }
 
     *strrchr(string, '\n') = '\0';
@@ -113,28 +159,6 @@ char* request_string()
     printf_debug_msg("request_string: got \"%s\"\n", string);
 
     return string;
-}
-
-
-bool check_ans(char* ans)
-{
-    assert(ans != NULL);
-
-    char* cur_pos = ans;
-    char* word = (char*) calloc(strlen(ans), sizeof(char*));
-    size_t read_symb = 0;
-    int read_stat = 1;
-
-    while (read_stat > 0)
-    {
-        read_stat = sscanf(cur_pos, "%s%n", word, &read_symb);
-        if (strcmp(word, "not") == 0)
-            return false;
-        cur_pos += read_symb;
-    }
-
-    free(word);
-    return true;
 }
 
 

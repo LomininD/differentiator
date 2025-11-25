@@ -6,6 +6,7 @@
 enum cmd_t
 {
     calculate_derivative,
+    calculate_partial_derivative,
     quit,
 
     unknown
@@ -20,7 +21,9 @@ enum ans_t
 };
 
 cmd_t get_cmd();
+int get_number();
 ans_t get_answer();
 char* request_string();
+char get_var_name();
 
 #endif

@@ -9,12 +9,13 @@
 static node* read_node(char** current_pos, size_t* node_count, err_t* read_error);
 static err_t parse_node_data(node* new_node, char* string);
 static void skip_spaces(char** current_pos);
+static err_t read_text_buf(FILE* file_ptr, char** text_buf_ptr);
 
 static err_t process_operation(node* new_node, diff_ops op);
 static err_t process_number(node* new_node, double number, const char* end_of_str);
 static err_t process_variable(node* new_node, char* string);
 
-err_t read_formula(tree* tree)
+err_t read_formula(tree* tree_ptr)
 {
     printf_debug_msg("read_formula: process started\n");
 
@@ -26,43 +27,62 @@ err_t read_formula(tree* tree)
 		return error;
     }
 
-    struct stat file_info = {};
-    fstat(fileno(load_ptr), &file_info);
-    size_t bytes_in_file = (size_t) file_info.st_size / sizeof(char);
-
-    char* text_buf = (char*) calloc (bytes_in_file + 1, sizeof(char));
-
-    if (text_buf == NULL) 
-    {
-        printf_log_err("[from read_formula] -> not enough memory to load formula\n");
-        return error;
-    }
-
-    size_t bytes_read = fread(text_buf, sizeof(char), bytes_in_file, load_ptr);
-
-    printf_debug_msg("read_formula: bytes in file: %zu\n", bytes_in_file);
-    printf_debug_msg("read_formula: bytes read:    %zu\n", bytes_read);
-
-	assert(bytes_in_file == bytes_read);
-
-    *(text_buf + bytes_in_file) = '\0';
-
-	tree->text_buf = text_buf;
+    char* text_buf = NULL;
+    err_t file_is_read = read_text_buf(load_ptr, &text_buf);
+    if (file_is_read != ok) return error;
+	tree_ptr->text_buf = text_buf;
     size_t node_count = 0;
 
 	err_t is_read = ok;
     node* root_node = read_node(&text_buf, &node_count, &is_read);
 	if (is_read != ok) return error;
-    tree->root = root_node;
-    tree->size = node_count;
+    tree_ptr->root = root_node;
+    tree_ptr->size = node_count;
 
     fclose(load_ptr);
 
-	VERIFY_TREE(error);
+	VERIFY_TREE(tree_ptr, error);
 
     printf_debug_msg("read_formula: process finished\n");
+	print_tree_dump(tree_ptr, "Read formula tree view");
 
-	print_tree_dump(tree, "Read formula tree view");
+    return ok;
+}
+
+
+err_t read_text_buf(FILE* file_ptr, char** text_buf_ptr)
+{
+    assert(file_ptr != NULL);
+
+    printf_debug_msg("read_text_bug: began process\n");
+
+
+    struct stat file_info = {};
+    fstat(fileno(file_ptr), &file_info);
+    size_t bytes_in_file = (size_t) file_info.st_size / sizeof(char);
+
+    char* text_buf = *text_buf_ptr = (char*) calloc (bytes_in_file + 1, sizeof(char));
+
+    if (text_buf == NULL) 
+    {
+        printf_log_err("[from read_text_buf] -> not enough memory to load formula\n");
+        return error;
+    }
+
+    size_t bytes_read = fread(text_buf, sizeof(char), bytes_in_file, file_ptr);
+
+    printf_debug_msg("read_text_buf: bytes in file: %zu\n", bytes_in_file);
+    printf_debug_msg("read_text_buf: bytes read:    %zu\n", bytes_read);
+
+    if (bytes_in_file != bytes_read)
+    {
+        printf_log_err("[from read_text_buf] -> number of read bytes does not equal to actual file_size\n");
+        return error;
+    }
+
+    *(text_buf + bytes_in_file) = '\0';
+
+    printf_debug_msg("read_text_bug: finished process\n");
 
     return ok;
 }

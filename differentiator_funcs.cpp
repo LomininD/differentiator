@@ -1,14 +1,17 @@
 #include "differentiator_funcs.h"
+#include <stdlib.h>
+#include <assert.h>
 
 
 // static void write_node(FILE* save_ptr, const tree* tree, const node* current_node);
 // static err_t process_saving(const tree* tree);
 // static err_t process_loading(tree* tree);
+static tree* differentiate_tree(tree* tree_ptr, char diff_var);
 
 
 void print_menu()
 {
-	printf_both("Choose a command to execute:\n");
+	printf_both("-> Choose a command to execute:\n");
 	printf("- [c]ount\n");
 	printf("- [s]implify\n");
 	printf("- [d]erivative\n");
@@ -19,7 +22,50 @@ void print_menu()
 }
 
 
+err_t process_calculating_partial_derivative(tree* tree_ptr)
+{
+	assert(tree_ptr != NULL);
 
+	printf_debug_msg("process_calculating_partial_derivative: began process\n");
+
+	printf_both("-> Enter differentiation variable name:\n");
+	char diff_var = get_var_name();
+
+	printf_both("-> Enter number of times to differentiate:\n");
+	int diff_times = get_number();
+
+	tree* tree_ptr_arr[100] = {}; // TODO - make dynamic
+	tree_ptr_arr[0] = tree_ptr;
+
+	for (int i = 1; i <= diff_times; i++)
+	{
+		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
+		CHECK_ERR;
+	}
+
+	
+
+	printf_debug_msg("process_calculating_partial_derivative: finished process\n");
+	return ok;
+}
+
+
+tree* differentiate_tree(tree* tree_ptr, char diff_var)
+{
+	assert(tree_ptr != NULL);
+	printf_debug_msg("differentiate_tree: began process\n");
+
+	tree* new_tree_ptr = tree_ctor();
+	if (new_tree_ptr == NULL) return NULL;
+
+
+
+
+
+	printf_debug_msg("differentiate_tree: finished process\n");
+
+	return new_tree_ptr;
+}
 
 
 // err_t process_saving(const tree* tree)

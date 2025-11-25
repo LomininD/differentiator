@@ -6,9 +6,7 @@
 #include "inout_funcs.h"
 
 void print_menu();
-cmd_t request_cmd(const tree* tree);
-err_t request_tree_beginning(tree* tree);
-err_t request_new_nodes(tree* tree, node* parent_node);
+err_t process_calculating_partial_derivative(tree* tree_ptr);
 
 
 #endif

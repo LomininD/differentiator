@@ -8,29 +8,33 @@ int main()
 {
     initialize_log("differentiator_log.html", "DIFFERENTIATOR LOG");
 
+    tree* main_tree_ptr = tree_ctor();
+    if (global_err_stat != ok) return 0;
 
-    tree main_tree = {};
-    tree_ctor(&main_tree);
-
-    err_t formula_ok = read_formula(&main_tree);
+    err_t formula_ok = read_formula(main_tree_ptr);
     if (formula_ok != ok) return 0;
 
-    while(true)
+    bool end = false;
+
+    while(!end)
     {
         print_menu();
 
         cmd_t current_cmd = get_cmd();
+        err_t executed = ok;
 
-        if (current_cmd == quit)
+        switch (current_cmd)
         {
-            break;
-        }
-        
-
+            case calculate_partial_derivative:
+                executed = process_calculating_partial_derivative(main_tree_ptr);
+                break;
+            case quit:
+                end = true;
+                break;
+        };
     }
 
-    destroy_tree(&main_tree);
-
+    destroy_tree(main_tree_ptr);
     end_debugging();
     return 0;
 }
