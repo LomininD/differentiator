@@ -5,7 +5,9 @@
 diff_op_t possible_ops[] = {{"+", ADD, differentiate_add},
 							{"-", SUB, differentiate_sub},
 							{"*", MUL, differentiate_mul},
-							{"/", DIV, differentiate_div}};
+							{"/", DIV, differentiate_div},
+							{"sin", SIN, differentiate_sin},
+							{"cos", COS, differentiate_cos}};
 
 #define check_for_mem_err(FUNC) { 															\
 	if (diffed_node_ptr == NULL)															\
@@ -78,55 +80,74 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 }
 
 
+#define assert_args assert(tree_ptr != NULL); assert(current_node_ptr != NULL)
 #define d(NODE_PTR) differentiate_node(tree_ptr, NODE_PTR, diff_var)
 #define c(NODE_PTR) copy_node(tree_ptr, NODE_PTR)
 #define l_subtr current_node_ptr->left
 #define r_subtr current_node_ptr->right
-#define to_op(CMD) (union data_t){.operation = CMD}
-#define nn(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
+#define to_op(CMD)  (union data_t){.operation = CMD}
+#define to_num(NUM) (union data_t){.number = NUM}
+#define non(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
+#define nnn(NUMBER, LEFT, RIGHT) create_and_initialise_node(NUM, to_num(NUMBER), LEFT, RIGHT, NULL)
 
 
 node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
+	assert_args;
 
 	tree_ptr->size += 1;
-	return nn(ADD, d(l_subtr), d(r_subtr));
+	return non(ADD, d(l_subtr), d(r_subtr));
 }
 
 node* differentiate_sub(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
+	assert_args;
 
 	tree_ptr->size += 1;
-	return nn(SUB, d(l_subtr), d(r_subtr));
+	return non(SUB, d(l_subtr), d(r_subtr));
 }
 
 node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
+	assert_args;
 
 	tree_ptr->size += 3;
-	return nn(ADD, nn(MUL, d(l_subtr), c(r_subtr)), \
-				   nn(MUL, c(l_subtr), d(r_subtr)));
+	return non(ADD, non(MUL, d(l_subtr), c(r_subtr)), \
+					non(MUL, c(l_subtr), d(r_subtr)));
 }
 
 node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
+	assert_args;
 
 	tree_ptr->size += 5;
-	return nn(DIV, nn(SUB, nn(MUL, d(l_subtr), c(r_subtr)), nn(MUL, c(l_subtr), d(r_subtr))), \
-				   nn(MUL, c(r_subtr), c(r_subtr)));
+	return non(DIV, non(SUB, non(MUL, d(l_subtr), c(r_subtr)), non(MUL, c(l_subtr), d(r_subtr))), \
+				   	non(MUL, c(r_subtr), c(r_subtr)));
 }
 
+node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 3;
+	return non(MUL, non(COS, nnn(0, NULL, NULL), c(r_subtr)), d(r_subtr));
+}
+
+node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 5;
+	return non(MUL, non(MUL, nnn(-1, NULL, NULL), non(SIN, nnn(0, NULL, NULL), c(r_subtr))), d(r_subtr));
+}
+
+
+#undef assert_args
 #undef d
 #undef c
 #undef l_subtr
 #undef r_subtr
 #undef to_op
-#undef nn
+#undef to_num
+#undef nnn
+#undef non

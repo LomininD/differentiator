@@ -1,1 +1,1 @@
-( / ( x nil nil ) ( 6 nil nil ) )
+( sin ( 0 nil nil ) ( x nil nil ))

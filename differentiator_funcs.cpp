@@ -121,7 +121,7 @@ const char* decode_operation_type_enum(diff_ops op)
 {
     for (int i = 0; i < op_count; i++)
     {
-        if (op == possible_ops[i].op)
+		if (op == possible_ops[i].op)
 			return possible_ops[i].name;
     }
 	return "unknown";

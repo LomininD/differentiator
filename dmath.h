@@ -23,5 +23,7 @@ node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_sub(tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var);
+node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var);
+node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var);
 
 #endif
