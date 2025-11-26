@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include "tree_dump.h"
 #include "tree_funcs.h"
+#include "differentiator_funcs.h"
 
 size_t node_count = 0;
 
@@ -306,24 +307,6 @@ const char* decode_node_type_enum(node_t type)
             return "number";
         default:
             return "unknown";
-    };
-}
-
-
-const char* decode_operation_type_enum(diff_ops op) // TODO - move to another file
-{
-    switch(op)
-    {
-        case ADD:
-            return "+";
-        case SUB:
-            return "-";
-        case MUL:
-            return "*";
-        case DIV:
-            return "/";
-        default:
-            return "unknown operation";
     };
 }
 

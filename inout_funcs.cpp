@@ -76,7 +76,6 @@ int get_number()
 
     while (!got_ans)
     {
-        char left_s = 0;
         int scanned = scanf("%d", &ans);
 
         printf_debug_msg("got %d\n", ans);

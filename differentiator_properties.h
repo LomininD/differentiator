@@ -9,11 +9,13 @@
 // TODO - move to other file
 enum diff_ops // decode_operation_type_enum | parse_node_data | enum
 {
-	UNKNOWN_OP,
+	UNKNOWN_OP = -1,
 	ADD,
 	SUB,
 	MUL,
-	DIV
+	DIV,
+
+	op_count
 };
 
 #include "debug_lib/debug.h"

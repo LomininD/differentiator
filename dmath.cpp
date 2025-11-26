@@ -66,22 +66,13 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 	assert(current_node_ptr != NULL);
 	node* diffed_node_ptr = NULL;
 
-	switch(current_node_ptr->data.operation) // TODO - optimize
+	for (int i = 0; i < op_count; i++)
 	{
-		case ADD:
-			diffed_node_ptr =  differentiate_add(tree_ptr, current_node_ptr, diff_var);
-			break;
-		case SUB:
-			diffed_node_ptr =  differentiate_sub(tree_ptr, current_node_ptr, diff_var);
-			break;
-		case MUL:
-			diffed_node_ptr = differentiate_mul(tree_ptr, current_node_ptr, diff_var);
-			break;
-		case DIV:
-			diffed_node_ptr = differentiate_div(tree_ptr, current_node_ptr, diff_var);
-			break;
-		default:
-	};
+		if (current_node_ptr->data.operation == possible_ops[i].op)
+		{
+			diffed_node_ptr = (*(possible_ops[i].diff_operation))(tree_ptr, current_node_ptr, diff_var);
+		}
+	}
 
 	return diffed_node_ptr;
 }

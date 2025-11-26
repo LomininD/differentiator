@@ -1,5 +1,7 @@
 #include "reader.h"
 #include "tree_funcs.h"
+#include "differentiator_funcs.h"
+#include "dmath.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <assert.h>
@@ -168,7 +170,7 @@ node* read_node(char** current_pos, size_t* node_count, err_t* read_error) // TO
 }
 
 
-err_t parse_node_data(node* new_node, char* string) // TODO - split into functions, move to another file
+err_t parse_node_data(node* new_node, char* string)
 {
 	assert(new_node != NULL);
 	assert (string != NULL);
@@ -176,25 +178,13 @@ err_t parse_node_data(node* new_node, char* string) // TODO - split into functio
 	printf_debug_msg("parse_node_data: process started\n");
     err_t processed = ok;
 
-	if (strcmp(string, "+") == 0) // TODO - remove copy pasting
+    for (int i = 0; i < op_count; i++)
     {
-		processed = process_operation(new_node, ADD);
-        return processed;
-    }
-	else if (strcmp(string, "-") == 0)
-    {
-        processed = process_operation(new_node, SUB);
-        return processed;
-    }
-    else if (strcmp(string, "*") == 0)
-    {
-        processed = process_operation(new_node, MUL);
-        return processed;
-    }
-    else if (strcmp(string, "/") == 0)
-    {
-        processed = process_operation(new_node, DIV);
-        return processed;
+        if (strcmp(string, possible_ops[i].name) == 0)
+        {
+            processed = process_operation(new_node, possible_ops[i].op);
+            return processed;
+        }
     }
 
 	char* end_of_str = string;
@@ -215,6 +205,8 @@ err_t process_operation(node* new_node, diff_ops op)
 {
     new_node->type = OP;
     new_node->data.operation = op;
+
+    printf_debug_msg("process_operation: got operation %d\n", op);
 
     printf_debug_msg("process_operation: recognized operation %s\n", decode_operation_type_enum(op));
 

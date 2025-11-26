@@ -8,7 +8,7 @@
 
 struct diff_op_t
 {
-	char* name;
+	const char* name;
 	diff_ops op;
 	node* (*diff_operation) (tree*, node*, char);
 };

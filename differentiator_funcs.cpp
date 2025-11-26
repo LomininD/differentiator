@@ -117,6 +117,17 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 }
 
 
+const char* decode_operation_type_enum(diff_ops op)
+{
+    for (int i = 0; i < op_count; i++)
+    {
+        if (op == possible_ops[i].op)
+			return possible_ops[i].name;
+    }
+	return "unknown";
+}
+
+
 // err_t process_saving(const tree* tree)
 // {
 //     md_t debug_mode = tree->debug_mode;

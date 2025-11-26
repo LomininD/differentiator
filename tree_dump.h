@@ -10,7 +10,6 @@ void print_tree_dump(const tree* tree, const char* format, ...);
 void generate_dump_image(const tree* tree);
 
 const char* decode_node_type_enum(node_t type);
-const char* decode_operation_type_enum(diff_ops op);
 
 err_t verify_tree(const tree* tree);
 err_t process_tree_verification(const tree* tree);
