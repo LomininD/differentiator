@@ -2,6 +2,10 @@
 #include <assert.h>
 #include "differentiator_funcs.h"
 
+diff_op_t possible_ops[] = {{"+", ADD, differentiate_add},
+							{"-", SUB, differentiate_sub},
+							{"*", MUL, differentiate_mul},
+							{"/", DIV, differentiate_div}};
 
 #define check_for_mem_err(FUNC) { 															\
 	if (diffed_node_ptr == NULL)															\
@@ -65,10 +69,10 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 	switch(current_node_ptr->data.operation) // TODO - optimize
 	{
 		case ADD:
-			diffed_node_ptr =  differentiate_add_sub(tree_ptr, current_node_ptr, diff_var, ADD);
+			diffed_node_ptr =  differentiate_add(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case SUB:
-			diffed_node_ptr =  differentiate_add_sub(tree_ptr, current_node_ptr, diff_var, SUB);
+			diffed_node_ptr =  differentiate_sub(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case MUL:
 			diffed_node_ptr = differentiate_mul(tree_ptr, current_node_ptr, diff_var);
@@ -91,13 +95,22 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 #define nn(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
 
 
-node* differentiate_add_sub(tree* tree_ptr, node* current_node_ptr, char diff_var, diff_ops op)
+node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	assert(tree_ptr != NULL);
 	assert(current_node_ptr != NULL);
 
 	tree_ptr->size += 1;
-	return nn(op, d(l_subtr), d(r_subtr));
+	return nn(ADD, d(l_subtr), d(r_subtr));
+}
+
+node* differentiate_sub(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node_ptr != NULL);
+
+	tree_ptr->size += 1;
+	return nn(SUB, d(l_subtr), d(r_subtr));
 }
 
 node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var)
