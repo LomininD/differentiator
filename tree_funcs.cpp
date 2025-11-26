@@ -37,37 +37,25 @@ node* copy_node(tree* tree_ptr, node* original_node_ptr)
 
     if (original_node_ptr == NULL) return NULL;
 
-    printf("ok\n");
-
     node* copied_node_ptr = NULL;
 
     switch(original_node_ptr->type)
     {
         case OP:
             copied_node_ptr = create_copy((union data_t){.operation = original_node_ptr->data.operation});
-            printf("%d\n", (union data_t){.operation = original_node_ptr->data.operation}.operation);
-            printf("OP\n");
-            printf("%d\n", copied_node_ptr->data.operation);
             break;
         case NUM:
             copied_node_ptr = create_copy((union data_t){.number = original_node_ptr->data.number});
-            printf("%d\n", (union data_t){.number = original_node_ptr->data.number}.number);
-            printf("NUM\n");
-            printf("%d\n", copied_node_ptr->data.number);
             break;
         case VAR:
             copied_node_ptr = create_copy((union data_t){.variable = original_node_ptr->data.variable});
-            printf("%c\n", (union data_t){.variable = original_node_ptr->data.variable}.variable);
-            printf("VAR\n");
-            printf("%c\n", copied_node_ptr->data.variable);
             break;
         default:
-            printf("aaaaaa\n");
             return NULL;
     };
 
     tree_ptr->size++;
-    printf("CREATED_COPY %p\n", copied_node_ptr);
+    printf_debug_msg("copy_node: created copy %p\n", copied_node_ptr);
 
     printf_debug_msg("copy_node: finished process\n");
     return copied_node_ptr;
@@ -105,7 +93,7 @@ node* create_and_initialise_node(node_t type, union data_t data, node* left, nod
             node_data.operation = data.operation;
             break;
         case VAR:
-            data.variable = data.variable;
+            node_data.variable = data.variable;
             break;
         case NUM:
             node_data.number = data.number;

@@ -74,7 +74,7 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 			diffed_node_ptr = differentiate_mul(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case DIV:
-			// differentiate_div()
+			diffed_node_ptr = differentiate_div(tree_ptr, current_node_ptr, diff_var);
 			break;
 		default:
 	};
@@ -88,7 +88,7 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 #define l_subtr current_node_ptr->left
 #define r_subtr current_node_ptr->right
 #define to_op(CMD) (union data_t){.operation = CMD}
-#define nn(...) create_and_initialise_node(__VA_ARGS__)
+#define nn(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
 
 
 node* differentiate_add_sub(tree* tree_ptr, node* current_node_ptr, char diff_var, diff_ops op)
@@ -97,7 +97,7 @@ node* differentiate_add_sub(tree* tree_ptr, node* current_node_ptr, char diff_va
 	assert(current_node_ptr != NULL);
 
 	tree_ptr->size += 1;
-	return nn(OP, to_op(op), d(l_subtr), d(r_subtr), NULL);
+	return nn(op, d(l_subtr), d(r_subtr));
 }
 
 node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var)
@@ -106,8 +106,18 @@ node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	assert(current_node_ptr != NULL);
 
 	tree_ptr->size += 3;
-	return nn(OP, to_op(ADD), nn(OP, to_op(MUL), d(l_subtr), c(r_subtr), NULL), \
-							  nn(OP, to_op(MUL), c(l_subtr), d(r_subtr), NULL), NULL);
+	return nn(ADD, nn(MUL, d(l_subtr), c(r_subtr)), \
+				   nn(MUL, c(l_subtr), d(r_subtr)));
+}
+
+node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node_ptr != NULL);
+
+	tree_ptr->size += 5;
+	return nn(DIV, nn(SUB, nn(MUL, d(l_subtr), c(r_subtr)), nn(MUL, c(l_subtr), d(r_subtr))), \
+				   nn(MUL, c(r_subtr), c(r_subtr)));
 }
 
 #undef d
@@ -115,3 +125,4 @@ node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var)
 #undef l_subtr
 #undef r_subtr
 #undef to_op
+#undef nn

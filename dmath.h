@@ -10,5 +10,6 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 
 node* differentiate_add_sub(tree* tree_ptr, node* current_node_ptr, char diff_var, diff_ops op);
 node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var);
+node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var);
 
 #endif
