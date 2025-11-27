@@ -29,8 +29,6 @@ tree* tree_ctor()
             copy_node(tree_ptr, original_node_ptr->left),                   \
             copy_node(tree_ptr, original_node_ptr->right), NULL);           \
 
-
-
 node* copy_node(tree* tree_ptr, node* original_node_ptr)
 {
     printf_debug_msg("copy_node: began process\n");
@@ -142,7 +140,7 @@ void destroy_node(node* node)
     {
         destroy_node(node->left);
     }
-    if (node->right)
+    if (node->right != NULL)
     {
         destroy_node(node->right); // TODO - if we have char* consider freeing it
     }

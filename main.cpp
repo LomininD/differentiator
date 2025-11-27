@@ -15,6 +15,8 @@ int main()
     err_t formula_ok = read_formula(main_tree_ptr);
     if (formula_ok != ok) return 0;
 
+    wrap_constants(main_tree_ptr); // TODO - remove
+
     bool end = false;
 
     while(!end)

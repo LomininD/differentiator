@@ -130,16 +130,16 @@ node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	assert_args;
 
-	tree_ptr->size += 3;
-	return non(MUL, non(COS, nnn(0, NULL, NULL), c(r_subtr)), d(r_subtr));
+	tree_ptr->size += 2;
+	return non(MUL, non(COS, NULL, c(r_subtr)), d(r_subtr));
 }
 
 node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	assert_args;
 
-	tree_ptr->size += 5;
-	return non(MUL, non(MUL, nnn(-1, NULL, NULL), non(SIN, nnn(0, NULL, NULL), c(r_subtr))), d(r_subtr));
+	tree_ptr->size += 4;
+	return non(MUL, non(MUL, nnn(-1, NULL, NULL), non(SIN, NULL, c(r_subtr))), d(r_subtr));
 }
 
 

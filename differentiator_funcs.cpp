@@ -47,6 +47,8 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 		CHECK_ERR(error);
 
 		print_tree_dump(tree_ptr_arr[i], "Differentiated tree view (%d)\n", i);
+
+		wrap_constants(tree_ptr_arr[i]);
 		// dump_to_tex
 	}
 	
@@ -152,7 +154,6 @@ err_t wrap_constants(tree* tree_ptr)
 bool wrap_node(tree* tree_ptr, node* current_node)
 {
 	assert(tree_ptr != NULL);
-	assert(current_node != NULL);
 
 	printf_debug_msg("wrap_node: wraping %p\n", current_node);
 
