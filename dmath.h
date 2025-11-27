@@ -11,6 +11,7 @@ struct diff_op_t
 	const char* name;
 	diff_ops op;
 	node* (*diff_operation) (tree*, node*, char);
+	double (*math_func) (double a, double b);
 };
 
 extern diff_op_t possible_ops[];
@@ -25,5 +26,12 @@ node* differentiate_mul(tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var);
+
+double calc_add(double a, double b);
+double calc_sub(double a, double b);
+double calc_mul(double a, double b);
+double calc_div(double a, double b);
+double calc_sin(double a, double b);
+double calc_cos(double a, double b);
 
 #endif

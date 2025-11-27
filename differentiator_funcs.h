@@ -9,5 +9,6 @@ void print_menu();
 err_t process_calculating_partial_derivative(tree* tree_ptr);
 node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
 const char* decode_operation_type_enum(diff_ops op);
+err_t wrap_constants(tree* tree_ptr);
 
 #endif

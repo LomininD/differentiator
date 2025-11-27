@@ -9,6 +9,9 @@
 // static err_t process_loading(tree* tree);
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
 
+static double calculate_node(tree* tree_ptr, node* current_node);
+static bool wrap_node(tree* tree_ptr, node* current_node);
+
 
 void print_menu()
 {
@@ -125,6 +128,96 @@ const char* decode_operation_type_enum(diff_ops op)
 			return possible_ops[i].name;
     }
 	return "unknown";
+}
+
+
+err_t wrap_constants(tree* tree_ptr)
+{
+	assert(tree_ptr != NULL);
+	
+	printf_debug_msg("wrap_constants: began process\n");
+	VERIFY_TREE(tree_ptr, error);
+
+	wrap_node(tree_ptr, tree_ptr->root);
+
+	VERIFY_TREE(tree_ptr, error);
+	printf_debug_msg("wrap_constants: finished process\n");
+
+	print_tree_dump(tree_ptr, "Wrapped tree view\n");
+
+	return ok;
+}
+
+// returns false if no var is found
+bool wrap_node(tree* tree_ptr, node* current_node)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+
+	printf_debug_msg("wrap_node: wraping %p\n", current_node);
+
+	if (current_node == NULL)
+		return false;
+
+	bool left_has_var = wrap_node(tree_ptr, current_node->left);
+	bool right_has_var = wrap_node(tree_ptr, current_node->right);
+
+	if (left_has_var || right_has_var)
+		return true;
+
+	if (current_node->type == VAR)
+	{
+		printf_debug_msg("wrap_node: node %p has variable\n", current_node);
+		return true;
+	}
+
+	if (current_node->type == NUM)
+		return false;
+
+	double node_val = calculate_node(tree_ptr, current_node);
+
+	destroy_node(current_node->left);
+	destroy_node(current_node->right);
+
+	current_node->left = NULL;
+	current_node->right = NULL;
+	current_node->type = NUM;
+	current_node->data.number = node_val;
+
+	tree_ptr->size -= 2;
+
+	printf_debug_msg("wrap_node: done wrapping %p\n", current_node);
+
+	return false;
+}
+
+
+double calculate_node(tree* tree_ptr, node* current_node)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+
+	if (current_node->type == NUM)
+		return current_node->data.number;
+
+	if (current_node->type == VAR)
+	{
+		printf_log_err("[from calculate_node] -> cannot calculate variables\n");
+		global_err_stat = error;
+		return -1;
+	}
+
+	double res = 0;
+	
+	for (int i = 0; i < op_count; i++)
+	{
+		if (current_node->data.operation == possible_ops[i].op)
+		{
+			res = (*(possible_ops[i].math_func)) (calculate_node(tree_ptr, current_node->left), calculate_node(tree_ptr, current_node->right));
+		}
+	}
+
+	return res;
 }
 
 

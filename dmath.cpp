@@ -1,13 +1,14 @@
 #include "dmath.h"
 #include <assert.h>
 #include "differentiator_funcs.h"
+#include <math.h>
 
-diff_op_t possible_ops[] = {{"+", ADD, differentiate_add},
-							{"-", SUB, differentiate_sub},
-							{"*", MUL, differentiate_mul},
-							{"/", DIV, differentiate_div},
-							{"sin", SIN, differentiate_sin},
-							{"cos", COS, differentiate_cos}};
+diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add},
+							{"-",   SUB, differentiate_sub,   calc_sub},
+							{"*",   MUL, differentiate_mul,   calc_mul},
+							{"/",   DIV, differentiate_div,   calc_div},
+							{"sin", SIN, differentiate_sin,   calc_sin},
+							{"cos", COS, differentiate_cos,   calc_cos}};
 
 #define check_for_mem_err(FUNC) { 															\
 	if (diffed_node_ptr == NULL)															\
@@ -151,3 +152,35 @@ node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
 #undef to_num
 #undef nnn
 #undef non
+
+
+double calc_add(double a, double b)
+{
+	return a + b;
+}
+
+double calc_sub(double a, double b)
+{
+	return a - b;
+}
+
+double calc_mul(double a, double b)
+{
+	return a * b;
+}
+
+double calc_div(double a, double b)
+{
+	return a / b;
+}
+
+double calc_sin(double a, double b)
+{
+	return sin(b);
+}
+
+double calc_cos(double a, double b)
+{
+	return cos(b);
+}
+
