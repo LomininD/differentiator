@@ -198,9 +198,9 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	}
 	else if ((*neutral_node)->data.number == 0)
 	{
-		if (branch_dir == left) 		current_node->parent->left  = NULL;
-		else if (branch_dir == right)   current_node->parent->right = NULL;
-		else 							tree_ptr->root = NULL;
+		if (branch_dir == left) 		current_node->parent->left  = *neutral_node;
+		else if (branch_dir == right)   current_node->parent->right = *neutral_node;
+		else 							tree_ptr->root = *neutral_node;
 
 		if (branch_dir != root)
 		{
@@ -210,7 +210,8 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		else
 			printf_debug_msg("current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
 
-		(*normal_node)->parent = current_node->parent;
+		(*neutral_node)->parent = current_node->parent;
+		*neutral_node = NULL;
 		has_neutral = true;
 	}
 
@@ -347,9 +348,9 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 			return false;
 		}
 
-		if (branch_dir == left) 		current_node->parent->left  = NULL;
-		else if (branch_dir == right)   current_node->parent->right = NULL;
-		else 							tree_ptr->root = NULL;
+		if (branch_dir == left) 		current_node->parent->left  = *neutral_node;
+		else if (branch_dir == right)   current_node->parent->right = *neutral_node;
+		else 							tree_ptr->root = *neutral_node;
 
 		if (branch_dir != root)
 		{
@@ -359,7 +360,8 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		else
 			printf_debug_msg("current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
 
-		(*normal_node)->parent = current_node->parent;
+		(*neutral_node)->parent = current_node->parent;
+		*neutral_node = NULL;
 		has_neutral = true;
 	}
 
