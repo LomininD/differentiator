@@ -11,6 +11,7 @@ struct diff_op_t
 	diff_ops op;
 	node* (*diff_operation) (tree*, node*, char);
 	double (*math_func) (double a, double b);
+	bool (*optimizator_func) (tree*, node*, node**, node**, dir_t);
 };
 
 extern diff_op_t possible_ops[];

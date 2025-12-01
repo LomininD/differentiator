@@ -8,7 +8,7 @@
 node* create_node();
 tree* tree_ctor();
 void destroy_tree(tree* tree);
-int destroy_node(node* node);
+size_t destroy_node(node* node);
 node* copy_node(tree* tree_ptr, node* original_node_ptr);
 node* create_and_initialise_node(node_t type, union data_t data, node* left, node* right, node* parent);
 

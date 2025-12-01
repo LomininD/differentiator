@@ -1,23 +1,12 @@
 #include "optimizator.h"
 #include <assert.h>
 #include "tree_funcs.h"
+#include "dmath.h"
 #include "differentiator_funcs.h"
-
-enum dir_t
-{
-	left,
-	right,
-	root,
-};
 
 static bool wrap_node(tree* tree_ptr, node* current_node);
 static void remove_neutral_elements_from_node(tree* tree_ptr, node* current_node, dir_t branch_dir);
-static void remove_excess_mul(tree* tree_ptr, node* current_node, dir_t branch_dir);
-static bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
-static void remove_excess_add_sub(tree* tree_ptr, node* current_node, dir_t branch_dir);
-static bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
-static void remove_excess_div(tree* tree_ptr, node* current_node, dir_t branch_dir);
-static bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
+static void remove_excess_node(tree* tree_ptr, node* current_node, dir_t branch_dir);
 
 
 void optimize_equation(tree* tree_ptr)
@@ -125,43 +114,35 @@ void remove_neutral_elements_from_node(tree* tree_ptr, node* current_node, dir_t
 	remove_neutral_elements_from_node(tree_ptr, current_node->right, right);
 
 	if (current_node->type == OP)
-	{
-		switch(current_node->data.operation)
-		{
-			case ADD:
-			case SUB:
-				remove_excess_add_sub(tree_ptr, current_node, branch_dir);
-				break;
-			case MUL:
-				remove_excess_mul(tree_ptr, current_node, branch_dir);
-				break;
-			case DIV:
-				remove_excess_div(tree_ptr, current_node, branch_dir);
-				break;
-		}
-	}
+		remove_excess_node(tree_ptr, current_node, branch_dir);
 }
 
 
-void remove_excess_mul(tree* tree_ptr, node* current_node, dir_t branch_dir)
+void remove_excess_node(tree* tree_ptr, node* current_node, dir_t branch_dir)
 {
 	assert(tree_ptr != NULL);
 	assert(current_node != NULL);
 
-	printf_debug_msg("remove_excess_mul: began processing %p\n", current_node);
+	printf_debug_msg("remove_excess_node: began processing %p\n", current_node);
 
 	bool removed = false;
-	
-	if (current_node->left != NULL)
-	{
-		removed = rm_mul_node(tree_ptr, current_node, &current_node->right, &current_node->left, branch_dir);
-		if (removed) return;
-	}
 
-	if (current_node->right != NULL)
+	for (int i = 0; i < op_count; i++)
 	{
-		removed = rm_mul_node(tree_ptr, current_node, &current_node->left, &current_node->right, branch_dir);
-		if (removed) return;
+		if (current_node->data.operation == possible_ops[i].op)
+		{
+			if (current_node->left != NULL)
+			{
+				removed = (*possible_ops[i].optimizator_func)(tree_ptr, current_node, &current_node->right, &current_node->left, branch_dir);
+				if (removed) return;
+			}
+
+			if (current_node->right != NULL)
+			{
+				removed = (*possible_ops[i].optimizator_func)(tree_ptr, current_node, &current_node->left, &current_node->right, branch_dir);
+				if (removed) return;
+			}
+		}
 	}
 }
 
@@ -217,35 +198,12 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 
 	if (has_neutral)
 	{
-		int destroyed = destroy_node(current_node);
+		size_t destroyed = destroy_node(current_node);
 		tree_ptr->size -= destroyed;
 		printf_debug_msg("rm_mul_node: removed neutral elements of %p \n", current_node);
 		return true;
 	}
 	return false;
-}
-
-
-void remove_excess_add_sub(tree* tree_ptr, node* current_node, dir_t branch_dir)
-{
-	assert(tree_ptr != NULL);
-	assert(current_node != NULL);
-
-	printf_debug_msg("remove_excess_add_sub: began processing %p\n", current_node);
-
-	bool removed = false;
-	
-	if (current_node->left != NULL)
-	{
-		removed = rm_add_sub_node(tree_ptr, current_node, &current_node->right, &current_node->left, branch_dir);
-		if (removed) return;
-	}
-
-	if (current_node->right != NULL)
-	{
-		removed = rm_add_sub_node(tree_ptr, current_node, &current_node->left, &current_node->right, branch_dir);
-		if (removed) return;
-	}
 }
 
 
@@ -266,46 +224,15 @@ bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, nod
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;
 		else 							tree_ptr->root = *normal_node;
 
-		if (branch_dir != root)
-		{
-			printf_debug_msg("rm_add_sub_node: current_node: %p, parent [%p] ->left = %p\n", current_node, current_node->parent, current_node->parent->left);
-			printf_debug_msg("rm_add_sub_node: current_node: %p, parent [%p] ->right = %p\n", current_node, current_node->parent, current_node->parent->right);
-		}
-		else
-			printf_debug_msg("rm_add_sub_node: current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
-
 		(*normal_node)->parent = current_node->parent;
 		*normal_node = NULL;
 
-		int destroyed = destroy_node(current_node);
+		size_t destroyed = destroy_node(current_node);
 		tree_ptr->size -= destroyed;
 		printf_debug_msg("rm_add_sub_node: removed neutral elements of %p \n", current_node);
 		return true;
 	}
 	return false;
-}
-
-
-void remove_excess_div(tree* tree_ptr, node* current_node, dir_t branch_dir)
-{
-	assert(tree_ptr != NULL);
-	assert(current_node != NULL);
-
-	printf_debug_msg("remove_excess_div: began processing %p\n", current_node);
-
-	bool removed = false;
-	
-	if (current_node->left != NULL)
-	{
-		removed = rm_div_node(tree_ptr, current_node, &current_node->right, &current_node->left, branch_dir);
-		if (removed) return;
-	}
-
-	if (current_node->right != NULL)
-	{
-		removed = rm_div_node(tree_ptr, current_node, &current_node->left, &current_node->right, branch_dir);
-		if (removed) return;
-	}
 }
 
 
@@ -327,14 +254,6 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;
 		else 							tree_ptr->root = *normal_node;
 
-		if (branch_dir != root)
-		{
-			printf_debug_msg("current_node: %p, parent [%p] ->left = %p\n", current_node, current_node->parent, current_node->parent->left);
-			printf_debug_msg("current_node: %p, parent [%p] ->right = %p\n", current_node, current_node->parent, current_node->parent->right);
-		}
-		else
-			printf_debug_msg("current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
-
 		(*normal_node)->parent = current_node->parent;
 		*normal_node = NULL;
 		has_neutral = true;
@@ -352,14 +271,6 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		else if (branch_dir == right)   current_node->parent->right = *neutral_node;
 		else 							tree_ptr->root = *neutral_node;
 
-		if (branch_dir != root)
-		{
-			printf_debug_msg("current_node: %p, parent [%p] ->left = %p\n", current_node,current_node ->parent, current_node->parent->left);
-			printf_debug_msg("current_node: %p, parent [%p] ->right = %p\n", current_node, current_node->parent, current_node->parent->right);
-		}
-		else
-			printf_debug_msg("current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
-
 		(*neutral_node)->parent = current_node->parent;
 		*neutral_node = NULL;
 		has_neutral = true;
@@ -367,10 +278,69 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 
 	if (has_neutral)
 	{
-		int destroyed = destroy_node(current_node);
+		size_t destroyed = destroy_node(current_node);
 		tree_ptr->size -= destroyed;
 		printf_debug_msg("rm_mul_node: removed neutral elements of %p \n", current_node);
 		return true;
 	}
+	return false;
+}
+
+
+bool rm_pow_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+	assert(normal_node != NULL);
+	assert(neutral_node != NULL);
+
+	printf_debug_msg("current_node = %p, normal_node = %p, neutral_node = %p\n", current_node, *normal_node, *neutral_node);
+
+	if ((*neutral_node)->type != NUM) return false;
+
+	bool has_neutral = false;
+	if ((*neutral_node)->data.number == 1)
+	{
+		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
+		else if (branch_dir == right)   current_node->parent->right = *normal_node;
+		else 							tree_ptr->root = *normal_node;
+
+		(*normal_node)->parent = current_node->parent;
+		*normal_node = NULL;
+		has_neutral = true;
+	}
+	else if ((*neutral_node)->data.number == 0)
+	{
+		if ((*normal_node)->type == NUM && (*normal_node)->data.number == 0)
+		{
+			printf_log_err("[from rm_pow_node] -> zero in base and zero in exponent is forbidden\n");
+			global_err_stat = error;
+			return false;
+		}
+		
+		node* new_node = create_and_initialise_node(NUM, (union data_t){.number = 1}, NULL, NULL, current_node->parent);
+
+		if (branch_dir == left) 		current_node->parent->left  = new_node;
+		else if (branch_dir == right)   current_node->parent->right = new_node;
+		else 							tree_ptr->root = new_node;
+
+		tree_ptr->size += 1;
+
+		has_neutral = true;
+	}
+
+	if (has_neutral)
+	{
+		size_t destroyed = destroy_node(current_node);
+		tree_ptr->size -= destroyed;
+		printf_debug_msg("rm_mul_node: removed neutral elements of %p \n", current_node);
+		return true;
+	}
+	return false;
+}
+
+
+bool rm_unremovable_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
 	return false;
 }

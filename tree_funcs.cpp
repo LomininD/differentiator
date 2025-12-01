@@ -131,11 +131,11 @@ void destroy_tree(tree* tree_ptr)
 }
 
 
-int destroy_node(node* node)
+size_t destroy_node(node* node)
 {
     if (node == NULL) return 0;
 
-    int nodes_destroyed = 0;
+    size_t nodes_destroyed = 0;
 
     if (node->left != NULL)
     {

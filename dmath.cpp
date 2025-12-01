@@ -2,16 +2,18 @@
 #include <assert.h>
 #include "differentiator_funcs.h"
 #include <math.h>
+#include "optimizator.h"
 
 static bool check_for_diff_var(node* current_node_ptr, char diff_var);
 
-diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add},
-							{"-",   SUB, differentiate_sub,   calc_sub},
-							{"*",   MUL, differentiate_mul,   calc_mul},
-							{"/",   DIV, differentiate_div,   calc_div},
-							{"sin", SIN, differentiate_sin,   calc_sin},
-							{"cos", COS, differentiate_cos,   calc_cos},
-							{"^",   POW, differentiate_pow,   calc_pow}};
+// TODO - remove to other file
+diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_sub_node},
+							{"-",   SUB, differentiate_sub,   calc_sub,  rm_add_sub_node},
+							{"*",   MUL, differentiate_mul,   calc_mul,  rm_mul_node},
+							{"/",   DIV, differentiate_div,   calc_div,  rm_div_node},
+							{"sin", SIN, differentiate_sin,   calc_sin,  rm_unremovable_node},
+							{"cos", COS, differentiate_cos,   calc_cos,  rm_unremovable_node},
+							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node}};
 
 #define check_for_mem_err(FUNC) { 															\
 	if (diffed_node_ptr == NULL)															\
