@@ -90,7 +90,7 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	assert(current_node_ptr != NULL);
 
 	printf_debug_msg("differentiate_node: began process\n");
-	printf("type = %d (%d)\n", current_node_ptr->type, OP);
+	printf("node = %p type = %d (%d)\n", current_node_ptr, current_node_ptr->type, OP);
 
 	node* diffed_node = NULL;
 

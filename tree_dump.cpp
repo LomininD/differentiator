@@ -267,6 +267,7 @@ const node* list_nodes(FILE* fp, const node* current_node)
     FPRINT("</TD>");
     END_ROW;
 
+
     BEGIN_ROW;
     FPRINT("<TD PORT=\"f0\">"); FPRINT("left ["); PRINT_PTR(current_node->left); FPRINT("] </TD>");
     FPRINT("<TD PORT=\"f1\">"); FPRINT("right [");  PRINT_PTR(current_node->right);  FPRINT("] </TD>");

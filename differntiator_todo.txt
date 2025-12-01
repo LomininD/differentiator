@@ -1,4 +1,18 @@
-// TODO - 
+// TODO - add other function derivatives (dont forget about neutral elements)
+// TODO - dump in tex
+// TODO - name table
+// TODO - count equation 
+// TODO - partial dump
+// TODO - full derivative
+// TODO - tailor polinomial 
+// TODO - graph of each equation 
+// TODO - ask all required data, execute all procedures in complex (remake user interface)
+// TODO - check math errors 
+// TODO - complete all todos
+// TODO - complete all todos from notebook 
+// TODO - add reader 
+// TODO - (optionally) - advertisements 
+
 
 ===QUESTIONS===
 - In which order we have includes of debug.h?
@@ -10,3 +24,60 @@
 - [g]raph
 - t[a]ngent
 - [t]aylor polynomial
+
+
+
+=============================================================
+
+
+> comment
+œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©ƒ∂ßå≈√∫˜µ≤≥÷
+
+язык в стиле лабы
+язык в стиле рецепта 
+
+язык который с какой-то вероятностью выполнит строчку и пишет в логе че сделал
+
+do smth
+please do smth
+please do smth properly 
+
+true false maybe
+
+begin_thinking_about()
+{
+	x <- one!
+	
+	think_about(x == two) 
+	good_idea
+	[
+		x <- twenty two!
+	]
+	bad_idea
+	[
+		x <- zero!
+	]
+	
+
+}
+stop_thinking
+
+if [a - 2]
+-> cmd1
+-> cmd2
+-> cmd3
+-> if [a - 3]
+-> -> cmd4
+-> -> 
+
+
+
+
+create var
+kill var
+
+
+~ this may be a comment
+
+§ this is a comment
+

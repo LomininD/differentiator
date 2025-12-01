@@ -3,12 +3,15 @@
 #include "differentiator_funcs.h"
 #include <math.h>
 
+static bool check_for_diff_var(node* current_node_ptr, char diff_var);
+
 diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add},
 							{"-",   SUB, differentiate_sub,   calc_sub},
 							{"*",   MUL, differentiate_mul,   calc_mul},
 							{"/",   DIV, differentiate_div,   calc_div},
 							{"sin", SIN, differentiate_sin,   calc_sin},
-							{"cos", COS, differentiate_cos,   calc_cos}};
+							{"cos", COS, differentiate_cos,   calc_cos},
+							{"^",   POW, differentiate_pow,   calc_pow}};
 
 #define check_for_mem_err(FUNC) { 															\
 	if (diffed_node_ptr == NULL)															\
@@ -90,7 +93,7 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 #define to_num(NUM) (union data_t){.number = NUM}
 #define non(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
 #define nnn(NUMBER, LEFT, RIGHT) create_and_initialise_node(NUM, to_num(NUMBER), LEFT, RIGHT, NULL)
-
+// TODO - remove left right
 
 node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
@@ -142,6 +145,36 @@ node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	return non(MUL, non(MUL, nnn(-1, NULL, NULL), non(SIN, NULL, c(r_subtr))), d(r_subtr));
 }
 
+node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	printf("DIFFERENTIATE NODE\n");
+
+	if (check_for_diff_var(current_node_ptr->left,  diff_var) && 
+		check_for_diff_var(current_node_ptr->right, diff_var))
+	{
+		printf_debug_msg("differentiate_pow: diff var in both args\n");
+		return NULL; // TODO - fix after adding ln	
+	}
+	else if (check_for_diff_var(current_node_ptr->left, diff_var))
+	{
+		printf_debug_msg("differentiate_pow: diff var in base of the degree\n");
+		tree_ptr->size += 5;
+		return non(MUL, c(current_node_ptr->right), 
+		non(MUL, non(POW, c(current_node_ptr->left), non(SUB, c(current_node_ptr->right), nnn(1, NULL, NULL))), d(current_node_ptr->left)));
+	}
+	else if (check_for_diff_var(current_node_ptr->right, diff_var))
+	{
+		printf_debug_msg("differentiate_pow: diff var in exponent\n");
+		return NULL; // TODO - fix after adding ln
+	}
+	else 
+	{
+		return c(current_node_ptr);
+	}
+}
+
 
 #undef assert_args
 #undef d
@@ -152,6 +185,20 @@ node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
 #undef to_num
 #undef nnn
 #undef non
+
+
+bool check_for_diff_var(node* current_node_ptr, char diff_var)
+{
+	if (current_node_ptr == NULL) return false;
+
+	if (current_node_ptr->type == VAR)
+	{
+		if (current_node_ptr->data.variable == diff_var)
+			return true;
+	}
+	return (check_for_diff_var(current_node_ptr->left,  diff_var) || 
+			check_for_diff_var(current_node_ptr->right, diff_var));
+}
 
 
 double calc_add(double a, double b)
@@ -182,5 +229,10 @@ double calc_sin(double a, double b)
 double calc_cos(double a, double b)
 {
 	return cos(b);
+}
+
+double calc_pow(double a, double b)
+{
+	return pow(a, b);
 }
 
