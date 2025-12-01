@@ -3,8 +3,7 @@
 
 #include "tree_properties.h"
 #include "tree_dump.h" 
-
-
+#include "optimizator.h"
 
 struct diff_op_t
 {

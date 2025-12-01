@@ -15,7 +15,7 @@ int main()
     err_t formula_ok = read_formula(main_tree_ptr);
     if (formula_ok != ok) return 0;
 
-    wrap_constants(main_tree_ptr); // TODO - remove
+    optimize_equation(main_tree_ptr);
 
     bool end = false;
 

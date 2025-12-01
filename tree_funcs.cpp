@@ -131,21 +131,28 @@ void destroy_tree(tree* tree_ptr)
 }
 
 
-void destroy_node(node* node)
+int destroy_node(node* node)
 {
-    if (node == NULL) return;
-    printf_debug_msg("deleting %p\n", node);
+    if (node == NULL) return 0;
+
+    int nodes_destroyed = 0;
 
     if (node->left != NULL)
     {
-        destroy_node(node->left);
+        nodes_destroyed += destroy_node(node->left);
     }
     if (node->right != NULL)
     {
-        destroy_node(node->right); // TODO - if we have char* consider freeing it
+        nodes_destroyed += destroy_node(node->right); // TODO - if we have char* consider freeing it
     }
 
+    printf_debug_msg("deleting %p\n", node);
+
     free(node);
+
+    nodes_destroyed ++;
+
+    return nodes_destroyed;
 }
 
 
