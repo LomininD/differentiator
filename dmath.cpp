@@ -1,90 +1,18 @@
 #include "dmath.h"
-#include <assert.h>
 #include "differentiator_funcs.h"
+#include <assert.h>
 #include <math.h>
-#include "optimizator.h"
 
-static bool check_for_diff_var(node* current_node_ptr, char diff_var);
+// TODO - remove excess headers
 
-// TODO - remove to other file
 diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_sub_node},
 							{"-",   SUB, differentiate_sub,   calc_sub,  rm_add_sub_node},
 							{"*",   MUL, differentiate_mul,   calc_mul,  rm_mul_node},
 							{"/",   DIV, differentiate_div,   calc_div,  rm_div_node},
-							{"sin", SIN, differentiate_sin,   calc_sin,  rm_unremovable_node},
-							{"cos", COS, differentiate_cos,   calc_cos,  rm_unremovable_node},
+							{"sin", SIN, differentiate_sin,   calc_sin,  rm_default_node},
+							{"cos", COS, differentiate_cos,   calc_cos,  rm_default_node},
 							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node},
-							{"ln",  LN,  differentiate_ln,    calc_ln,   rm_unremovable_node}};
-
-#define check_for_mem_err(FUNC) { 															\
-	if (diffed_node_ptr == NULL)															\
-	{																						\
-		printf_log_err("[from %s] -> could not allocate memory for new node\n", FUNC);		\
-		global_err_stat = error;															\
-		return NULL;																		\
-	}																						\
-}
-
-
-node* differentiate_number_node(tree* tree_ptr, node* current_node_ptr)
-{
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
-
-	node* diffed_node_ptr = (node*) calloc(1, sizeof(node));
-	check_for_mem_err("differentiate_number_node");
-
-	tree_ptr->size += 1;
-	
-	diffed_node_ptr->type = NUM;
-
-	diffed_node_ptr->data.number = 0;
-
-	return diffed_node_ptr;
-}
-
-
-node* differentiate_var_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
-{
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
-
-	node* diffed_node_ptr = (node*) calloc(1, sizeof(node));
-	check_for_mem_err("differentiate_var_node");
-
-	tree_ptr->size += 1;
-
-	if (current_node_ptr->data.variable == diff_var)
-	{
-		diffed_node_ptr->type = NUM;
-		diffed_node_ptr->data.number = 1;
-	}
-	else
-	{
-		diffed_node_ptr->type = VAR;
-		diffed_node_ptr->data.variable = current_node_ptr->data.variable;
-	}
-
-	return diffed_node_ptr;
-}
-
-
-node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
-{
-	assert(tree_ptr != NULL);
-	assert(current_node_ptr != NULL);
-	node* diffed_node_ptr = NULL;
-
-	for (int i = 0; i < op_count; i++)
-	{
-		if (current_node_ptr->data.operation == possible_ops[i].op)
-		{
-			diffed_node_ptr = (*(possible_ops[i].diff_operation))(tree_ptr, current_node_ptr, diff_var);
-		}
-	}
-
-	return diffed_node_ptr;
-}
+							{"ln",  LN,  differentiate_ln,    calc_ln,   rm_default_node}};
 
 
 #define assert_args assert(tree_ptr != NULL); assert(current_node_ptr != NULL)
@@ -128,7 +56,7 @@ node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	assert_args;
 
-	tree_ptr->size += 5;
+	tree_ptr->size += 6;
 	return non(DIV, 
 					non(SUB, 
 							 non(MUL, d(l_subtr), c(r_subtr)), 
@@ -168,7 +96,20 @@ node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
 		check_for_diff_var(current_node_ptr->right, diff_var))
 	{
 		printf_debug_msg("differentiate_pow: diff var in both args\n");
-		return NULL; // TODO - fix after adding ln	
+		tree_ptr->size += 6;
+
+		return non(MUL,
+						c(current_node_ptr),
+						non(ADD,
+								 non(MUL,
+								 		  d(r_subtr),
+										  non(LN, NULL, c(l_subtr))),
+								 non(MUL, 
+								 		  c(r_subtr),
+										  non(DIV, 
+										  		   d(l_subtr),
+												   c(l_subtr)))));
+		
 	}
 	else if (check_for_diff_var(current_node_ptr->left, diff_var))
 	{
@@ -227,20 +168,6 @@ node* differentiate_ln(tree* tree_ptr, node* current_node_ptr, char diff_var)
 #undef compound_func
 
 
-bool check_for_diff_var(node* current_node_ptr, char diff_var)
-{
-	if (current_node_ptr == NULL) return false;
-
-	if (current_node_ptr->type == VAR)
-	{
-		if (current_node_ptr->data.variable == diff_var)
-			return true;
-	}
-	return (check_for_diff_var(current_node_ptr->left,  diff_var) || 
-			check_for_diff_var(current_node_ptr->right, diff_var));
-}
-
-
 double calc_add(double a, double b)
 {
 	return a + b;
@@ -279,5 +206,206 @@ double calc_pow(double a, double b)
 double calc_ln(double a, double b)
 {
 	return log(b);
+}
+
+
+
+
+bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+	assert(normal_node != NULL);
+	assert(neutral_node != NULL);
+
+	printf_debug_msg("current_node = %p, normal_node = %p, neutral_node = %p\n", current_node, *normal_node, *neutral_node);
+
+	if ((*neutral_node)->type != NUM) return false;
+
+	bool has_neutral = false;
+	if ((*neutral_node)->data.number == 1)
+	{
+		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
+		else if (branch_dir == right)   current_node->parent->right = *normal_node;
+		else 							tree_ptr->root = *normal_node;
+
+		if (branch_dir != root)
+		{
+			printf_debug_msg("current_node: %p, parent [%p] ->left = %p\n", current_node, current_node->parent, current_node->parent->left);
+			printf_debug_msg("current_node: %p, parent [%p] ->right = %p\n", current_node, current_node->parent, current_node->parent->right);
+		}
+		else
+			printf_debug_msg("current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
+
+		(*normal_node)->parent = current_node->parent;
+		*normal_node = NULL;
+		has_neutral = true;
+	}
+	else if ((*neutral_node)->data.number == 0)
+	{
+		if (branch_dir == left) 		current_node->parent->left  = *neutral_node;
+		else if (branch_dir == right)   current_node->parent->right = *neutral_node;
+		else 							tree_ptr->root = *neutral_node;
+
+		if (branch_dir != root)
+		{
+			printf_debug_msg("current_node: %p, parent [%p] ->left = %p\n", current_node,current_node ->parent, current_node->parent->left);
+			printf_debug_msg("current_node: %p, parent [%p] ->right = %p\n", current_node, current_node->parent, current_node->parent->right);
+		}
+		else
+			printf_debug_msg("current_node: %p, parent [%p] root = %p\n", current_node, current_node->parent, tree_ptr->root);
+
+		(*neutral_node)->parent = current_node->parent;
+		*neutral_node = NULL;
+		has_neutral = true;
+	}
+
+	if (has_neutral)
+	{
+		size_t destroyed = destroy_node(current_node);
+		tree_ptr->size -= destroyed;
+		printf_debug_msg("rm_mul_node: removed neutral elements of %p \n", current_node);
+		return true;
+	}
+	return false;
+}
+
+
+bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+	assert(normal_node != NULL);
+	assert(neutral_node != NULL);
+
+	printf_debug_msg("rm_add_sub_node: current_node = %p, normal_node = %p, neutral_node = %p\n", current_node, *normal_node, *neutral_node);
+
+	if ((*neutral_node)->type != NUM) return false;
+
+	if ((*neutral_node)->data.number == 0)
+	{
+		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
+		else if (branch_dir == right)   current_node->parent->right = *normal_node;
+		else 							tree_ptr->root = *normal_node;
+
+		(*normal_node)->parent = current_node->parent;
+		*normal_node = NULL;
+
+		size_t destroyed = destroy_node(current_node);
+		tree_ptr->size -= destroyed;
+		printf_debug_msg("rm_add_sub_node: removed neutral elements of %p \n", current_node);
+		return true;
+	}
+	return false;
+}
+
+
+bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+	assert(normal_node != NULL);
+	assert(neutral_node != NULL);
+
+	printf_debug_msg("current_node = %p, normal_node = %p, neutral_node = %p\n", current_node, *normal_node, *neutral_node);
+
+	if ((*neutral_node)->type != NUM) return false;
+
+	bool has_neutral = false;
+	if ((*neutral_node)->data.number == 1 && current_node->right == *neutral_node)
+	{
+		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
+		else if (branch_dir == right)   current_node->parent->right = *normal_node;
+		else 							tree_ptr->root = *normal_node;
+
+		(*normal_node)->parent = current_node->parent;
+		*normal_node = NULL;
+		has_neutral = true;
+	}
+	else if ((*neutral_node)->data.number == 0)
+	{
+		if (*neutral_node == current_node->right)
+		{
+			printf_log_err("[from rm_div_node] -> division by zero\n");
+			global_err_stat = error;
+			return false;
+		}
+
+		if (branch_dir == left) 		current_node->parent->left  = *neutral_node;
+		else if (branch_dir == right)   current_node->parent->right = *neutral_node;
+		else 							tree_ptr->root = *neutral_node;
+
+		(*neutral_node)->parent = current_node->parent;
+		*neutral_node = NULL;
+		has_neutral = true;
+	}
+
+	if (has_neutral)
+	{
+		size_t destroyed = destroy_node(current_node);
+		tree_ptr->size -= destroyed;
+		printf_debug_msg("rm_mul_node: removed neutral elements of %p \n", current_node);
+		return true;
+	}
+	return false;
+}
+
+
+bool rm_pow_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	assert(tree_ptr != NULL);
+	assert(current_node != NULL);
+	assert(normal_node != NULL);
+	assert(neutral_node != NULL);
+
+	printf_debug_msg("current_node = %p, normal_node = %p, neutral_node = %p\n", current_node, *normal_node, *neutral_node);
+
+	if ((*neutral_node)->type != NUM) return false;
+
+	bool has_neutral = false;
+	if ((*neutral_node)->data.number == 1)
+	{
+		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
+		else if (branch_dir == right)   current_node->parent->right = *normal_node;
+		else 							tree_ptr->root = *normal_node;
+
+		(*normal_node)->parent = current_node->parent;
+		*normal_node = NULL;
+		has_neutral = true;
+	}
+	else if ((*neutral_node)->data.number == 0)
+	{
+		if ((*normal_node)->type == NUM && (*normal_node)->data.number == 0)
+		{
+			printf_log_err("[from rm_pow_node] -> zero in base and zero in exponent is forbidden\n");
+			global_err_stat = error;
+			return false;
+		}
+		
+		node* new_node = create_and_initialise_node(NUM, (union data_t){.number = 1}, NULL, NULL, current_node->parent);
+
+		if (branch_dir == left) 		current_node->parent->left  = new_node;
+		else if (branch_dir == right)   current_node->parent->right = new_node;
+		else 							tree_ptr->root = new_node;
+
+		tree_ptr->size += 1;
+
+		has_neutral = true;
+	}
+
+	if (has_neutral)
+	{
+		size_t destroyed = destroy_node(current_node);
+		tree_ptr->size -= destroyed;
+		printf_debug_msg("rm_mul_node: removed neutral elements of %p \n", current_node);
+		return true;
+	}
+	return false;
+}
+
+
+bool rm_default_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	return false;
 }
 

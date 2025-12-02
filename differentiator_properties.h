@@ -6,8 +6,7 @@
 #define TREE_VERIFICATION
 //#define ADVERTISEMENTS
 
-// TODO - move to other file
-enum diff_ops // decode_operation_type_enum | parse_node_data | enum
+enum diff_ops // FIXME - remove 
 {
 	UNKNOWN_OP = -1,
 	ADD,

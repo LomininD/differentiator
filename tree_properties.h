@@ -3,6 +3,13 @@
 
 #include "differentiator_properties.h"
 
+enum dir_t
+{
+	left,
+	right,
+	root,
+};
+
 enum node_t
 {
     UNKNOWN_TYPE,

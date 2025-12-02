@@ -12,6 +12,7 @@
 // TODO - complete all todos from notebook 
 // TODO - add reader 
 // TODO - (optionally) - advertisements 
+// TODO - check for math errors
 
 
 ===QUESTIONS===
