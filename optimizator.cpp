@@ -63,20 +63,25 @@ bool wrap_node(tree* tree_ptr, node* current_node)
 		return true;
 	}
 
-	if (current_node->type == NUM)
-		return false;
+	if (current_node->type == NUM) return false;
+
+	if (current_node->data.operation == LN  || 
+		current_node->data.operation == SIN ||
+		current_node->data.operation == COS) return false; // TODO - we dont always need to wrap these funcs
 
 	double node_val = calculate_node(tree_ptr, current_node);
 
-	destroy_node(current_node->left);
-	destroy_node(current_node->right);
+	size_t destroyed_nodes = 0;
+
+	destroyed_nodes += destroy_node(current_node->left);
+	destroyed_nodes += destroy_node(current_node->right);
 
 	current_node->left = NULL;
 	current_node->right = NULL;
 	current_node->type = NUM;
 	current_node->data.number = node_val;
 
-	tree_ptr->size -= 2;
+	tree_ptr->size -= destroyed_nodes;
 
 	printf_debug_msg("wrap_node: done wrapping %p\n", current_node);
 
@@ -248,7 +253,7 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	if ((*neutral_node)->type != NUM) return false;
 
 	bool has_neutral = false;
-	if ((*neutral_node)->data.number == 1)
+	if ((*neutral_node)->data.number == 1 && current_node->right == *neutral_node)
 	{
 		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;

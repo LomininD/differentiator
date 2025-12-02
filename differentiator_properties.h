@@ -17,6 +17,7 @@ enum diff_ops // decode_operation_type_enum | parse_node_data | enum
 	SIN,
 	COS,
 	POW,
+	LN,
 
 	op_count
 };

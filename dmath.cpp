@@ -13,7 +13,8 @@ diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_
 							{"/",   DIV, differentiate_div,   calc_div,  rm_div_node},
 							{"sin", SIN, differentiate_sin,   calc_sin,  rm_unremovable_node},
 							{"cos", COS, differentiate_cos,   calc_cos,  rm_unremovable_node},
-							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node}};
+							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node},
+							{"ln",  LN,  differentiate_ln,    calc_ln,   rm_unremovable_node}};
 
 #define check_for_mem_err(FUNC) { 															\
 	if (diffed_node_ptr == NULL)															\
@@ -95,6 +96,7 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 #define to_num(NUM) (union data_t){.number = NUM}
 #define non(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
 #define nnn(NUMBER, LEFT, RIGHT) create_and_initialise_node(NUM, to_num(NUMBER), LEFT, RIGHT, NULL)
+#define compound_func(EXP, INSIDE_FUNC) non(MUL, EXP, d(INSIDE_FUNC))
 // TODO - remove left right
 
 node* differentiate_add(tree* tree_ptr, node* current_node_ptr, char diff_var)
@@ -127,8 +129,13 @@ node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	assert_args;
 
 	tree_ptr->size += 5;
-	return non(DIV, non(SUB, non(MUL, d(l_subtr), c(r_subtr)), non(MUL, c(l_subtr), d(r_subtr))), \
-				   	non(MUL, c(r_subtr), c(r_subtr)));
+	return non(DIV, 
+					non(SUB, 
+							 non(MUL, d(l_subtr), c(r_subtr)), 
+							 non(MUL, c(l_subtr), d(r_subtr))), 
+				   	non(POW, 
+							 c(r_subtr), 
+							 nnn(2, NULL, NULL)));
 }
 
 node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var)
@@ -136,7 +143,8 @@ node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	assert_args;
 
 	tree_ptr->size += 2;
-	return non(MUL, non(COS, NULL, c(r_subtr)), d(r_subtr));
+	return compound_func(non(COS, NULL, c(r_subtr)), 
+						 r_subtr);
 }
 
 node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
@@ -144,7 +152,10 @@ node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	assert_args;
 
 	tree_ptr->size += 4;
-	return non(MUL, non(MUL, nnn(-1, NULL, NULL), non(SIN, NULL, c(r_subtr))), d(r_subtr));
+	return compound_func(non(MUL, 
+								  nnn(-1, NULL, NULL), 
+								  non(SIN, NULL, c(r_subtr))), 
+						 r_subtr);
 }
 
 node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
@@ -163,18 +174,44 @@ node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	{
 		printf_debug_msg("differentiate_pow: diff var in base of the degree\n");
 		tree_ptr->size += 5;
-		return non(MUL, c(current_node_ptr->right), 
-		non(MUL, non(POW, c(current_node_ptr->left), non(SUB, c(current_node_ptr->right), nnn(1, NULL, NULL))), d(current_node_ptr->left)));
+
+		return compound_func(non(MUL,
+									 c(r_subtr),  
+									 non(POW, 
+								 			  c(l_subtr), 
+								 			  non(SUB, 
+										  			   c(r_subtr), 
+										  			   nnn(1, NULL, NULL)))), 
+							 current_node_ptr->left);
+
 	}
 	else if (check_for_diff_var(current_node_ptr->right, diff_var))
 	{
 		printf_debug_msg("differentiate_pow: diff var in exponent\n");
-		return NULL; // TODO - fix after adding ln
+
+		tree_ptr->size += 3;
+
+		return compound_func(non(MUL,											 
+								 	  c(current_node_ptr), 						
+				 				 	  non(LN, NULL, c(l_subtr))),
+				 			 r_subtr);
+
 	}
 	else 
 	{
 		return c(current_node_ptr);
 	}
+}
+
+node* differentiate_ln(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 3;
+	return compound_func(non(DIV, 
+								  nnn(1, NULL, NULL), 
+								  c(current_node_ptr->right)),   
+						 current_node_ptr->right);
 }
 
 
@@ -187,6 +224,7 @@ node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
 #undef to_num
 #undef nnn
 #undef non
+#undef compound_func
 
 
 bool check_for_diff_var(node* current_node_ptr, char diff_var)
@@ -236,5 +274,10 @@ double calc_cos(double a, double b)
 double calc_pow(double a, double b)
 {
 	return pow(a, b);
+}
+
+double calc_ln(double a, double b)
+{
+	return log(b);
 }
 

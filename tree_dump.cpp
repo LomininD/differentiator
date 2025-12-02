@@ -26,7 +26,7 @@ err_t verify_tree(const tree* tree)
     if (tree->err_stat != ok)
     {
         printf_log_err("[from verify_tree] -> err_stat is not ok\n");
-        error_count++;
+        return error;
     }
 
     node_count = 0;

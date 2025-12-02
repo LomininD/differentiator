@@ -97,12 +97,15 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	switch(current_node_ptr->type)
 	{
 		case NUM:
+			printf_debug_msg("differentiate_node: got number node\n")
 			diffed_node = differentiate_number_node(tree_ptr, current_node_ptr);
 			break;
 		case VAR:
+			printf_debug_msg("differentiate_node: got variable node\n")
 			diffed_node  = differentiate_var_node(tree_ptr, current_node_ptr, diff_var);
 			break;
 		case OP:
+			printf_debug_msg("differentiate_node: got operation node\n")
 			diffed_node = differentiate_op_node(tree_ptr, current_node_ptr, diff_var);
 			break;
 		default:
@@ -133,7 +136,8 @@ const char* decode_operation_type_enum(diff_ops op)
 double calculate_node(tree* tree_ptr, node* current_node) // TODO - work with sin/cos
 {
 	assert(tree_ptr != NULL);
-	assert(current_node != NULL);
+
+	if (current_node == NULL) return 0;
 
 	if (current_node->type == NUM)
 		return current_node->data.number;
