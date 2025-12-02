@@ -1,6 +1,7 @@
 #include "differentiator_funcs.h"
 #include <stdlib.h>
 #include <assert.h>
+#include "tex_dump.h"
 
 
 // static void write_node(FILE* save_ptr, const tree* tree, const node* current_node);
@@ -39,13 +40,17 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 
 	for (int i = 1; i <= diff_times; i++)
 	{
+		dump_start_of_differentiation(tree_ptr_arr[i-1], diff_var);
+
 		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
 		CHECK_ERR(error);
 
 		print_tree_dump(tree_ptr_arr[i], "Differentiated tree view (%d)\n", i);
+		dump_intermediate_calculations(tree_ptr_arr[i]);
 
 		optimize_equation(tree_ptr_arr[i]);
-		// dump_to_tex
+
+		dump_end_of_differentiation();
 	}
 	
 	printf_debug_msg("process_calculating_partial_derivative: cleaning up tree_ptr_arr\n");

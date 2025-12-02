@@ -3,6 +3,7 @@
 #include "tree_funcs.h"
 #include "dmath.h"
 #include "differentiator_funcs.h"
+#include "tex_dump.h"
 
 static bool wrap_node(tree* tree_ptr, node* current_node);
 static void remove_neutral_elements_from_node(tree* tree_ptr, node* current_node, dir_t branch_dir);
@@ -17,9 +18,14 @@ void optimize_equation(tree* tree_ptr)
 	while (old_size != new_size)
 	{
 		old_size = tree_ptr->size;
+
 		wrap_constants(tree_ptr);
+
 		delete_neutral_elements(tree_ptr);
+
 		new_size = tree_ptr->size;
+
+		if (old_size != new_size) dump_intermediate_calculations(tree_ptr);
 	}
 }
 

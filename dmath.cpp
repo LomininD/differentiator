@@ -2,17 +2,18 @@
 #include "differentiator_funcs.h"
 #include <assert.h>
 #include <math.h>
+#include "tex_dump.h"
 
 // TODO - remove excess headers
 
-diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_sub_node},
-							{"-",   SUB, differentiate_sub,   calc_sub,  rm_add_sub_node},
-							{"*",   MUL, differentiate_mul,   calc_mul,  rm_mul_node},
-							{"/",   DIV, differentiate_div,   calc_div,  rm_div_node},
-							{"sin", SIN, differentiate_sin,   calc_sin,  rm_default_node},
-							{"cos", COS, differentiate_cos,   calc_cos,  rm_default_node},
-							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node},
-							{"ln",  LN,  differentiate_ln,    calc_ln,   rm_default_node}};
+diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_sub_node,	dump_add_sub},
+							{"-",   SUB, differentiate_sub,   calc_sub,  rm_add_sub_node, 	dump_add_sub},
+							{"*",   MUL, differentiate_mul,   calc_mul,  rm_mul_node,		dump_mul},
+							{"/",   DIV, differentiate_div,   calc_div,  rm_div_node,		dump_div},
+							{"sin", SIN, differentiate_sin,   calc_sin,  rm_default_node, 	dump_unary_func},
+							{"cos", COS, differentiate_cos,   calc_cos,  rm_default_node, 	dump_unary_func},
+							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node, 		dump_pow},
+							{"ln",  LN,  differentiate_ln,    calc_ln,   rm_default_node, 	dump_unary_func}};
 
 
 #define assert_args assert(tree_ptr != NULL); assert(current_node_ptr != NULL)
