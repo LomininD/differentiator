@@ -8,6 +8,7 @@ bool read_error;
 node* get_general_tree(char** text_buf, size_t* tree_size);
 node* get_expression(char** text_buf, size_t* tree_size);
 node* get_term(char** text_buf, size_t* tree_size);
+node* get_power(char** text_buf, size_t* tree_size);
 node* get_parenthesis(char** text_buf, size_t* tree_size);
 node* get_var(char** text_buf, size_t* tree_size);
 node* get_number(char** text_buf, size_t* tree_size);
@@ -184,7 +185,7 @@ node* get_term(char** text_buf, size_t* tree_size)
 {
 	assert_errs(NULL);
 	
-	node* node_1 = get_parenthesis(text_buf, tree_size);
+	node* node_1 = get_power(text_buf, tree_size);
 	assert_errs(NULL);
 
 	skip_spaces(text_buf);
@@ -195,7 +196,7 @@ node* get_term(char** text_buf, size_t* tree_size)
 		(*text_buf)++;
 		skip_spaces(text_buf);
 
-		node* node_2 = get_parenthesis(text_buf, tree_size);
+		node* node_2 = get_power(text_buf, tree_size);
 		assert_errs(NULL);
 
 		if (op == '*')
@@ -203,6 +204,37 @@ node* get_term(char** text_buf, size_t* tree_size)
 		else
 			node_1 = create_and_initialise_node(OP, (union data_t){.operation = DIV}, node_1, node_2, NULL);
 
+		node_1->left->parent = node_1;
+		node_1->right->parent = node_1;
+
+		(*tree_size)++;
+	}
+
+	skip_spaces(text_buf);
+
+	return node_1;
+}
+
+
+node* get_power(char** text_buf, size_t* tree_size)
+{
+	assert_errs(NULL);
+
+	node* node_1 = get_parenthesis(text_buf, tree_size);
+	assert_errs(NULL);
+
+	skip_spaces(text_buf);
+
+	while (**text_buf == '^')
+	{
+		(*text_buf)++;
+		skip_spaces(text_buf);
+
+		node* node_2 = get_parenthesis(text_buf, tree_size);
+		assert_errs(NULL);
+
+		node_1 = create_and_initialise_node(OP, (union data_t){.operation = POW}, node_1, node_2, NULL);
+		
 		node_1->left->parent = node_1;
 		node_1->right->parent = node_1;
 

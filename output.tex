@@ -1,0 +1,70 @@
+\documentclass{article}
+\setlength{\parindent}{0pt}
+\usepackage{graphicx}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\usepackage[left=2cm, top=2cm, right=2cm, bottom=2cm]{geometry}
+
+\usepackage{breqn}\title{ Техосмотр функции с Александром Пéтровичем}
+\author{ Developed by LMD }
+\begin{document}
+\maketitle
+\pagebreak
+\section{Основное уравнение}
+Итак, нам дан такой пример: \\ 
+\begin{dmath*}[spread=10pt]
+f\left( x\right) = \frac{ x ^{ 3 } }{ 12 + x ^{ 2 } } 
+\end{dmath*}
+Расчехляем дифференциатор и начинаем считать.
+\pagebreak
+\section{Расчет производной}
+
+Посчитаем производную 1-го порядка: \\ 
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( x \right)= 1 
+\end{dmath*}
+
+Любой уважающий себя синус трепыхается от -1 до 1. \\ 
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( x ^{ 3 } \right)= 3 \cdot x ^{ \left( 3 - 1 \right) } \cdot 1 
+\end{dmath*}
+
+Этим дрючат студентов на третьем курсе, но это очень лёгкая вещь. Вот смотрите: \\ 
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( 12 \right)= 0 
+\end{dmath*}
+
+Так, я же нигде не обосрался? \textit{(© A. Скубачевский)} \\ 
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( x \right)= 1 
+\end{dmath*}
+
+Куда ни ткни -- всё дрянь какая-то... Не надо только тереть, а то потом концов не соберём. \\ 
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( x ^{ 2 } \right)= 2 \cdot x ^{ \left( 2 - 1 \right) } \cdot 1 
+\end{dmath*}
+
+С*ка, у неё остаточный член! Но зато какой! \textit{(© 2-е задание по матану)} \\ 
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( 12 + x ^{ 2 } \right)= 0 + 2 \cdot x ^{ \left( 2 - 1 \right) } \cdot 1 
+\end{dmath*}
+
+Любой уважающий себя синус трепыхается от -1 до 1. \\ 
+
+По итогу получаем:
+
+\begin{dmath*}[spread=10pt]
+\frac{d}{dx} \left( \frac{ x ^{ 3 } }{ 12 + x ^{ 2 } } \right)= \frac{ 3 \cdot x ^{ \left( 3 - 1 \right) } \cdot 1 \cdot \left( 12 + x ^{ 2 } \right) - x ^{ 3 } \cdot \left( 0 + 2 \cdot x ^{ \left( 2 - 1 \right) } \cdot 1 \right) }{ \left( 12 + x ^{ 2 } \right) ^{ 2 } } = \frac{ 3 \cdot x ^{ 2 } \cdot \left( 12 + x ^{ 2 } \right) - x ^{ 3 } \cdot 2 \cdot x }{ \left( 12 + x ^{ 2 } \right) ^{ 2 } } 
+\end{dmath*}
+
+Всё, что недосократилось, сократите сами, РУЧКАМИ
+
+\end{document}
