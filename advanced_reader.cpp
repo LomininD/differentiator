@@ -1,13 +1,16 @@
 #include "reader.h"
 #include "advanced_reader.h"
+#include "differentiator_funcs.h"
 
 // TODO - check errs
 
 bool read_error;
 node* get_general_tree(char** text_buf, size_t* tree_size);
-node* get_number(char** text_buf, size_t* tree_size);
-node* get_parenthesis(char** text_buf, size_t* tree_size);
 node* get_expression(char** text_buf, size_t* tree_size);
+node* get_term(char** text_buf, size_t* tree_size);
+node* get_parenthesis(char** text_buf, size_t* tree_size);
+node* get_var(char** text_buf, size_t* tree_size);
+node* get_number(char** text_buf, size_t* tree_size);
 
 #define assert_errs(RET) if (read_error) return RET;
 
@@ -75,16 +78,37 @@ node* get_number(char** text_buf, size_t* tree_size)
 		num_len++;
 	} 
 
-	if (num_len == 0)
-	{
-		printf_log_err("[from advanced_reader] -> got corrupted number\n");
-		read_error = true;
-		return NULL;
-	}
+	if (num_len == 0) return NULL;
 	
 	skip_spaces(text_buf);
 	node* new_node = create_and_initialise_node(NUM, (union data_t){.number = val}, NULL, NULL, NULL);
 	if (is_neagtive) new_node->data.number *= -1;
+	(*tree_size)++;
+	return new_node;
+}
+
+
+node* get_var(char** text_buf, size_t* tree_size)
+{
+	assert_errs(NULL);
+
+	char var_name = 0;
+
+	if ('a' <= **text_buf && **text_buf <= 'z')
+	{
+		var_name = **text_buf;
+    	name_table[hash_var(var_name)].var = var_name;
+	}
+	else
+	{
+		printf_log_err("[from get_var] -> cannot recognize variable name\n");
+		read_error = true;
+		return NULL;
+	}
+
+	(*text_buf)++;
+	skip_spaces(text_buf);
+	node* new_node = create_and_initialise_node(VAR, (union data_t){.variable = var_name}, NULL, NULL, NULL);
 	(*tree_size)++;
 	return new_node;
 }
@@ -98,6 +122,7 @@ node* get_parenthesis(char** text_buf, size_t* tree_size)
 	{
 		(*text_buf)++;
 		node* new_node = get_expression(text_buf, tree_size);
+		assert_errs(NULL);
 
 		if (**text_buf != ')')
 		{
@@ -111,7 +136,12 @@ node* get_parenthesis(char** text_buf, size_t* tree_size)
 		return new_node;
 	}
 	else
-		return get_number(text_buf, tree_size);
+	{
+		node* new_node = get_number(text_buf, tree_size);
+		assert_errs(NULL);
+		if (new_node == NULL) new_node = get_var(text_buf, tree_size);
+		return new_node;
+	}
 }
 
 
@@ -119,9 +149,8 @@ node* get_expression(char** text_buf, size_t* tree_size)
 {
 	assert_errs(NULL);
 	
-	node* node_1 = get_parenthesis(text_buf, tree_size);
-	
-	node* new_node = NULL;
+	node* node_1 = get_term(text_buf, tree_size);
+	assert_errs(NULL);
 
 	skip_spaces(text_buf);
 
@@ -131,23 +160,58 @@ node* get_expression(char** text_buf, size_t* tree_size)
 		(*text_buf)++;
 		skip_spaces(text_buf);
 
-		node* node_2 = get_parenthesis(text_buf, tree_size);
+		node* node_2 = get_term(text_buf, tree_size);
+		assert_errs(NULL);
 
 		if (op == '+')
-			new_node = create_and_initialise_node(OP, (union data_t){.operation = ADD}, node_1, node_2, NULL);
+			node_1 = create_and_initialise_node(OP, (union data_t){.operation = ADD}, node_1, node_2, NULL);
 		else
-			new_node = create_and_initialise_node(OP, (union data_t){.operation = SUB}, node_1, node_2, NULL);
+			node_1 = create_and_initialise_node(OP, (union data_t){.operation = SUB}, node_1, node_2, NULL);
 
-		node_1->parent = new_node;
-		node_2->parent = new_node;
+		node_1->left->parent = node_1;
+		node_1->right->parent = node_1;
 
 		(*tree_size)++;
-		node_1 = new_node;
 	}
 
 	skip_spaces(text_buf);
 
-	return new_node;
+	return node_1;
+}
+
+
+node* get_term(char** text_buf, size_t* tree_size)
+{
+	assert_errs(NULL);
+	
+	node* node_1 = get_parenthesis(text_buf, tree_size);
+	assert_errs(NULL);
+
+	skip_spaces(text_buf);
+
+	while (**text_buf == '*' || **text_buf == '/')
+	{
+		char op = **text_buf;
+		(*text_buf)++;
+		skip_spaces(text_buf);
+
+		node* node_2 = get_parenthesis(text_buf, tree_size);
+		assert_errs(NULL);
+
+		if (op == '*')
+			node_1 = create_and_initialise_node(OP, (union data_t){.operation = MUL}, node_1, node_2, NULL);
+		else
+			node_1 = create_and_initialise_node(OP, (union data_t){.operation = DIV}, node_1, node_2, NULL);
+
+		node_1->left->parent = node_1;
+		node_1->right->parent = node_1;
+
+		(*tree_size)++;
+	}
+
+	skip_spaces(text_buf);
+
+	return node_1;
 }
 
 
@@ -156,6 +220,7 @@ node* get_general_tree(char** text_buf, size_t* tree_size)
 	assert_errs(NULL);
 	
 	node* root_node = get_expression(text_buf, tree_size);
+	assert_errs(NULL);
 
 	skip_spaces(text_buf);
 

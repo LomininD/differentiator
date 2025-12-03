@@ -37,6 +37,7 @@ void initialise_tex_file()
 	srand(time(NULL));
 	tex_ptr = fopen(output_file_name, "w");	
 	fprint("\\documentclass{article}\n");
+	fprint("\\setlength{\\parindent}{0pt}\n");
 	fprint("\\usepackage{graphicx}\n");
 	fprint("\\usepackage[T2A]{fontenc}\n");
 	fprint("\\usepackage[utf8]{inputenc}\n");
