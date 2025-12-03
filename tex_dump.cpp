@@ -93,7 +93,7 @@ void dump_node(node* node_ptr)
 	switch(node_ptr->type)
 	{
 		case NUM:
-			if (node_ptr->data.number < 0) need_p = true;
+			if (node_ptr->data.number < 0 && node_ptr->parent != NULL) need_p = true;
 			if (need_p) fprint("\\left( ");
 			fprint("%lg ", node_ptr->data.number);
 			if (need_p) fprint("\\right) ");
@@ -177,10 +177,10 @@ void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 {
 	bool need_p = true;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
-								 && (parent_op == DIV ||
-								 	 parent_op == ADD ||
-									 parent_op == SUB)) need_p = false;
+								 && (parent_op == DIV || parent_op == ADD)) need_p = false;
+
 	check_for_outer_pars;
+
 	open_par;
 	dump_node(node_ptr->left);
 	fprint("%s ", op_struct->name);
@@ -188,7 +188,6 @@ void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 	close_par;
 }
 
-//TODO - add priority in struct
 
 void dump_mul(node* node_ptr, diff_op_t* op_struct)
 {

@@ -49,10 +49,27 @@ node* get_number(char** text_buf, size_t* tree_size)
 	
 	int val = 0;
 	int num_len = 0;
+	bool is_neagtive = false;
 	puts(*text_buf);
 
-	while('0' <= **text_buf && **text_buf <= '9')
+	while(('0' <= **text_buf && **text_buf <= '9') || **text_buf == '-')
 	{
+		if (**text_buf == '-')
+		{
+			if (!is_neagtive && num_len == 0)
+			{
+				is_neagtive = true;
+				printf("negative\n");
+				(*text_buf)++;
+				continue;
+			}
+			else
+			{
+				printf_log_err("[from get_number] -> got wrong minus in number\n");
+				read_error = true;
+				return NULL;
+			}
+		}
 		val = val * 10 + (**text_buf - '0');
 		(*text_buf)++;
 		num_len++;
@@ -67,6 +84,7 @@ node* get_number(char** text_buf, size_t* tree_size)
 	
 	skip_spaces(text_buf);
 	node* new_node = create_and_initialise_node(NUM, (union data_t){.number = val}, NULL, NULL, NULL);
+	if (is_neagtive) new_node->data.number *= -1;
 	(*tree_size)++;
 	return new_node;
 }
@@ -118,7 +136,7 @@ node* get_expression(char** text_buf, size_t* tree_size)
 		if (op == '+')
 			new_node = create_and_initialise_node(OP, (union data_t){.operation = ADD}, node_1, node_2, NULL);
 		else
-			new_node = create_and_initialise_node(OP, (union data_t){.operation = ADD}, node_1, node_2, NULL);
+			new_node = create_and_initialise_node(OP, (union data_t){.operation = SUB}, node_1, node_2, NULL);
 
 		node_1->parent = new_node;
 		node_2->parent = new_node;
