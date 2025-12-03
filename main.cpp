@@ -2,6 +2,7 @@
 #include "differentiator_funcs.h"
 #include "tree_funcs.h"
 #include "reader.h"
+#include "advanced_reader.h"
 #include <stdlib.h>
 #include "tex_dump.h"
 
@@ -14,7 +15,7 @@ int main()
     tree* main_tree_ptr = tree_ctor();
     if (global_err_stat != ok) return 0;
 
-    err_t formula_ok = read_formula(main_tree_ptr);
+    err_t formula_ok = advanced_read_formula(main_tree_ptr);
     if (formula_ok != ok) return 0;
 
     fill_main_equation_preamble(main_tree_ptr);

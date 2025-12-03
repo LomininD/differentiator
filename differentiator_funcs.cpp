@@ -42,7 +42,7 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 
 	for (int i = 1; i <= diff_times; i++)
 	{
-		dump_text("Посчитаем производную %d-го порядка:\n\n", i);
+		dump_text("Посчитаем производную %d-го порядка: \\\\ \n\n", i);
 		
 		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
 		CHECK_ERR(error);

@@ -10,8 +10,7 @@
 
 static node* read_node(char** current_pos, size_t* node_count, err_t* read_error);
 static err_t parse_node_data(node* new_node, char* string);
-static void skip_spaces(char** current_pos);
-static err_t read_text_buf(FILE* file_ptr, char** text_buf_ptr);
+err_t read_text_buf(FILE* file_ptr, char** text_buf_ptr);
 
 static err_t process_operation(node* new_node, diff_ops op);
 static err_t process_number(node* new_node, double number, const char* end_of_str);
