@@ -4,12 +4,14 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <time.h>
+#include "differentiator_funcs.h"
 
 FILE* tex_ptr = NULL;
 const char* output_file_name = "output.tex";
 const char* open_file_cmd = "open output.pdf";
 
 static void dump_node(node* node_ptr);
+static void dump_vars();
 
 const char* phrase_bank[] = {"Любой уважающий себя синус трепыхается от -1 до 1.",
 							 "Это выражение из логарифмов ни уму ни сердцу ничего не говорит",
@@ -23,8 +25,10 @@ const char* phrase_bank[] = {"Любой уважающий себя синус 
 							 "Очень приплюснутая штучка! Ан прямо интересно, какая приплюснутая!",
 							 "Сейчас всё возрастает, а потом убывает, а потом опять возрастает, а потом.... чёрт его знает",
 							 "Если вы не воспринимаете того, что я сейчас вам говорю.... а ну и бог с ним!",
-							 "Этим дрючат студентов на третьем курсе, но это очень лёгкая вещь. Вот смотрите....",
-							 "Подставили интеграл -- всё, трах-тарарах, скончалось!"};
+							 "Этим дрючат студентов на третьем курсе, но это очень лёгкая вещь. Вот смотрите:",
+							 "Подставили интеграл -- всё, трах-тарарах, скончалось!",
+							 "Ну всё, п***ц \\textit{(© A. Скубачевский)}",
+							 "С*ка, у неё остаточный член! Но зато какой! \\textit{(© 2-е задание по матану)}"};
 
 #define fprint(...) fprintf(tex_ptr, __VA_ARGS__)
 
@@ -39,7 +43,7 @@ void initialise_tex_file()
 	fprint("\\usepackage[russian]{babel}\n\n");
 	fprint("\\usepackage[left=2cm, top=2cm, right=2cm, bottom=2cm]{geometry}\n\n");
 	fprint("\\usepackage{breqn}");
-	fprint("\\title{ Отчёт дифференциатора }\n");
+	fprint("\\title{ Техосмотр функции с Александром Пéтровичем}\n");
 	fprint("\\author{ Developed by LMD }\n");
 	fprint("\\begin{document}\n");
 	fprint("\\maketitle\n");
@@ -51,7 +55,24 @@ void fill_main_equation_preamble(tree* tree_ptr)
 	fprint("\\section{Основное уравнение}\n");
 	fprint("Итак, нам дан такой пример: \\\\ \n");
 	fprint("\\begin{dmath*}[spread=10pt]\n");
+	fprint("f\\left( ");
+	dump_vars();
+	fprint("\\right) = ");
 	dump_node(tree_ptr->root);
+}
+
+void dump_vars()
+{
+	bool first_var = true;
+	for (int i = 0; i < name_table_size; i++)
+	{
+		if (name_table[i].var != 0)
+		{
+			if (!first_var) fprint(", ");
+			fprint("%c", name_table[i].var);
+			first_var = false;
+		}
+	}
 }
 
 void dump_end_main_equation_preamble()
@@ -67,10 +88,15 @@ void dump_node(node* node_ptr)
 {
 	assert(node_ptr != NULL);
 
+	bool need_p = false;
+
 	switch(node_ptr->type)
 	{
 		case NUM:
+			if (node_ptr->data.number < 0) need_p = true;
+			if (need_p) fprint("\\left( ");
 			fprint("%lg ", node_ptr->data.number);
+			if (need_p) fprint("\\right) ");
 			break;
 		case VAR:
 			fprint("%c ", node_ptr->data.variable);

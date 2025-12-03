@@ -8,6 +8,7 @@ const size_t sys_str_size = 200;
 
 void print_tree_dump(const tree* tree, const char* format, ...);
 void generate_dump_image(const tree* tree);
+void dump_name_table();
 
 const char* decode_node_type_enum(node_t type);
 

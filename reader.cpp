@@ -249,6 +249,9 @@ err_t process_variable(node* new_node, char* string)
 	new_node->type = VAR;
 	new_node->data.variable = *string;
 
+    printf("hashed = %d\n", hash_var(*string));
+    name_table[hash_var(*string)].var = *string;
+
 	printf_debug_msg("process_variable: recognized variable name %s\n", string);
     return ok;
 }

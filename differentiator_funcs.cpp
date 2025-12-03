@@ -4,6 +4,8 @@
 #include "tex_dump.h"
 
 
+name_record name_table[name_table_size] = {};
+
 // static void write_node(FILE* save_ptr, const tree* tree, const node* current_node);
 // static err_t process_saving(const tree* tree);
 // static err_t process_loading(tree* tree);
@@ -263,6 +265,12 @@ bool check_for_diff_var(node* current_node_ptr, char diff_var)
 	}
 	return (check_for_diff_var(current_node_ptr->left,  diff_var) || 
 			check_for_diff_var(current_node_ptr->right, diff_var));
+}
+
+
+int hash_var(char var)
+{
+	return var - 'a';
 }
 
 // err_t process_saving(const tree* tree)

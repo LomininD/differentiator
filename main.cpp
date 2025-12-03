@@ -21,6 +21,8 @@ int main()
     optimize_equation(main_tree_ptr);
     dump_end_main_equation_preamble();
 
+    dump_name_table();
+
     //bool end = false;
 
     fill_derivative_preamble();

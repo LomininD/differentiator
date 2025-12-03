@@ -7,6 +7,17 @@
 #include "optimizator.h"
 #include "dmath.h"
 
+const int name_table_size = 26;
+
+struct name_record
+{
+	char var;
+	double value;
+};
+
+extern name_record name_table[];
+
+
 void print_menu();
 err_t process_calculating_partial_derivative(tree* tree_ptr);
 node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
@@ -15,6 +26,8 @@ err_t wrap_constants(tree* tree_ptr);
 err_t delete_neutral_elements(tree* tree_ptr);
 double calculate_node(tree* tree_ptr, node* current_node);
 bool check_for_diff_var(node* current_node_ptr, char diff_var);
+
+int hash_var(char var);
 
 node* differentiate_number_node(tree* tree_ptr, node* current_node_ptr);
 node* differentiate_var_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
