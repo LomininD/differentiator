@@ -40,8 +40,12 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 
 	for (int i = 1; i <= diff_times; i++)
 	{
+		dump_text("Посчитаем производную %d-го порядка:\n\n", i);
+		
 		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
 		CHECK_ERR(error);
+
+		dump_text("По итогу получаем:\n\n");
 
 		dump_start_of_differentiation(tree_ptr_arr[i-1]->root, diff_var);
 
@@ -51,6 +55,8 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 		optimize_equation(tree_ptr_arr[i]);
 
 		dump_end_of_differentiation();
+
+		dump_text("Всё, что недосократилось, сократите сами, РУЧКАМИ\n\n");
 	}
 	
 	printf_debug_msg("process_calculating_partial_derivative: cleaning up tree_ptr_arr\n");
@@ -120,9 +126,13 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 
 	CHECK_ERR(NULL);
 
-	dump_start_of_differentiation(current_node_ptr, diff_var);
-	dump_intermediate_calculations(diffed_node);
-	dump_end_of_differentiation();
+	if (current_node_ptr->parent != NULL)
+	{
+		dump_start_of_differentiation(current_node_ptr, diff_var);
+		dump_intermediate_calculations(diffed_node);
+		dump_end_of_differentiation();
+		insert_random_phrase();
+	}
 
 	printf_debug_msg("differentiate_node: finished process\n");
 

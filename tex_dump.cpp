@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "tree_funcs.h"
 #include <assert.h>
+#include <stdarg.h>
+#include <time.h>
 
 FILE* tex_ptr = NULL;
 const char* output_file_name = "output.tex";
@@ -9,11 +11,26 @@ const char* open_file_cmd = "open output.pdf";
 
 static void dump_node(node* node_ptr);
 
+const char* phrase_bank[] = {"Любой уважающий себя синус трепыхается от -1 до 1.",
+							 "Это выражение из логарифмов ни уму ни сердцу ничего не говорит",
+							 "Единичка скончалась",
+							 "Не занимайтесь членовредительством!",
+							 "Открываем БАЛШОЙ, БАЛШОЙ КВАДРАТНЫЙ СКОБКА",
+							 "Производная -- это, конечно, приятно, но зачем она нужна?!",
+							 "Ну, вы же ясно видите, что расстояние между точками увеличилось в корень из двух раз.",
+							 "Причёсываем это выражение",
+							 "Куда ни ткни -- всё дрянь какая-то... Не надо только тереть, а то потом концов не соберём.",
+							 "Очень приплюснутая штучка! Ан прямо интересно, какая приплюснутая!",
+							 "Сейчас всё возрастает, а потом убывает, а потом опять возрастает, а потом.... чёрт его знает",
+							 "Если вы не воспринимаете того, что я сейчас вам говорю.... а ну и бог с ним!",
+							 "Этим дрючат студентов на третьем курсе, но это очень лёгкая вещь. Вот смотрите....",
+							 "Подставили интеграл -- всё, трах-тарарах, скончалось!"};
 
 #define fprint(...) fprintf(tex_ptr, __VA_ARGS__)
 
 void initialise_tex_file()
 {
+	srand(time(NULL));
 	tex_ptr = fopen(output_file_name, "w");	
 	fprint("\\documentclass{article}\n");
 	fprint("\\usepackage{graphicx}\n");
@@ -75,8 +92,7 @@ void dump_node(node* node_ptr)
 void fill_derivative_preamble()
 {
 	fprint("\\pagebreak\n");
-	fprint("\\section{Расчет производной}\n");
-	fprint("Здесь будет считаться производная\n");
+	fprint("\\section{Расчет производной}\n\n");
 }
 
 void dump_start_of_differentiation(node* node_ptr, char diff_var)
@@ -96,6 +112,25 @@ void dump_intermediate_calculations(node* node_ptr)
 void dump_end_of_differentiation()
 {
 	fprint("\n\\end{dmath*}\n\n");
+}
+
+void dump_text(const char* format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+
+	vfprintf(tex_ptr, format, ap);
+
+	va_end(ap);
+}
+
+void insert_random_phrase()
+{
+	double normalized = (double) rand() / (double) RAND_MAX;
+	int ind = (int)(normalized * (double)(sizeof(phrase_bank) / (double)sizeof(const char*)));
+
+	fprint("%s \\\\ \n\n", phrase_bank[ind]);
+	printf("%d\n", ind);
 }
 
 void close_tex_file()
