@@ -9,8 +9,8 @@ void fill_main_equation_preamble(tree* tree_ptr);
 void dump_end_main_equation_preamble();
 
 void fill_derivative_preamble();
-void dump_start_of_differentiation(tree* tree_ptr, char diff_var);
-void dump_intermediate_calculations(tree* tree_ptr);
+void dump_start_of_differentiation(node* node_ptr, char diff_var);
+void dump_intermediate_calculations(node* node_ptr);
 void dump_end_of_differentiation();
 
 void close_tex_file();

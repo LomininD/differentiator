@@ -7,7 +7,6 @@ FILE* tex_ptr = NULL;
 const char* output_file_name = "output.tex";
 const char* open_file_cmd = "open output.pdf";
 
-static void dump_tree_in_tex(tree* tree_ptr);
 static void dump_node(node* node_ptr);
 
 
@@ -21,6 +20,7 @@ void initialise_tex_file()
 	fprint("\\usepackage[T2A]{fontenc}\n");
 	fprint("\\usepackage[utf8]{inputenc}\n");
 	fprint("\\usepackage[russian]{babel}\n\n");
+	fprint("\\usepackage[left=2cm, top=2cm, right=2cm, bottom=2cm]{geometry}\n\n");
 	fprint("\\usepackage{breqn}");
 	fprint("\\title{ Отчёт дифференциатора }\n");
 	fprint("\\author{ Developed by LMD }\n");
@@ -33,8 +33,8 @@ void fill_main_equation_preamble(tree* tree_ptr)
 	fprint("\\pagebreak\n");
 	fprint("\\section{Основное уравнение}\n");
 	fprint("Итак, нам дан такой пример: \\\\ \n");
-	fprint("\\begin{dmath*}\n");
-	dump_tree_in_tex(tree_ptr);
+	fprint("\\begin{dmath*}[spread=10pt]\n");
+	dump_node(tree_ptr->root);
 }
 
 void dump_end_main_equation_preamble()
@@ -43,12 +43,6 @@ void dump_end_main_equation_preamble()
 	fprint("Расчехляем дифференциатор и начинаем считать.\n");
 }
 
-void dump_tree_in_tex(tree* tree_ptr)
-{
-	VERIFY_TREE(tree_ptr,); // !!!
-
-	dump_node(tree_ptr->root);
-}
 
 #define cur_op node_ptr->data.operation
 
@@ -76,7 +70,7 @@ void dump_node(node* node_ptr)
 	};
 }
 
-#undef cur_op
+
 
 void fill_derivative_preamble()
 {
@@ -85,18 +79,18 @@ void fill_derivative_preamble()
 	fprint("Здесь будет считаться производная\n");
 }
 
-void dump_start_of_differentiation(tree* tree_ptr, char diff_var)
+void dump_start_of_differentiation(node* node_ptr, char diff_var)
 {
-	fprint("\\begin{dmath*}\n");
+	fprint("\\begin{dmath*}[spread=10pt]\n");
 	fprint("\\frac{d}{d%c} \\left( ", diff_var);
-	dump_tree_in_tex(tree_ptr);
+	dump_node(node_ptr);
 	fprint("\\right)");
 }
 
-void dump_intermediate_calculations(tree* tree_ptr)
+void dump_intermediate_calculations(node* node_ptr)
 {
 	fprint("= ");
-	dump_tree_in_tex(tree_ptr);
+	dump_node(node_ptr);
 }
 
 void dump_end_of_differentiation()
@@ -110,27 +104,49 @@ void close_tex_file()
 	fclose(tex_ptr);
 }
 
+// TODO - change long expr with letters
 //----------------------------------------- DUMP OPERATIONS -------------------------------------------
+
+#define open_par  if (need_p) fprint("\\left( ")
+#define close_par if (need_p) fprint("\\right) ")
+#define parent_op node_ptr->parent->data.operation
+#define check_for_outer_pars if (node_ptr->parent == NULL) need_p = false
 
 void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 {
 	bool need_p = true;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
-								 && node_ptr->parent->data.operation == DIV) need_p = false;
-	if (need_p) fprint("\\left( ");
+								 && (parent_op == DIV ||
+								 	 parent_op == ADD ||
+									 parent_op == SUB)) need_p = false;
+	check_for_outer_pars;
+	open_par;
 	dump_node(node_ptr->left);
 	fprint("%s ", op_struct->name);
 	dump_node(node_ptr->right);
-	if (need_p) fprint("\\right) ");
+	close_par;
 }
+
+//TODO - add priority in struct
 
 void dump_mul(node* node_ptr, diff_op_t* op_struct)
 {
-	fprint("\\left( ");
+	bool need_p = true;
+	//bool need_dot = false;
+	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
+								 && (parent_op == MUL || 
+								 	 parent_op == ADD || 
+									 parent_op == SUB)) need_p = false;
+
+	// if (node_ptr->right->type == NUM || 
+	// 			(node_ptr->right->data.operation == MUL && 
+	// 							node_ptr->right->left->type == NUM)) need_dot = true;
+	check_for_outer_pars;
+	open_par;
 	dump_node(node_ptr->left);
-	//if (node_ptr->right->type = NUM) fprint("\\cdot ");
+	fprint("\\cdot ");
 	dump_node(node_ptr->right);
-	fprint("\\right) ");
+	close_par;
 }
 
 void dump_div(node* node_ptr, diff_op_t* op_struct)
@@ -151,14 +167,22 @@ void dump_unary_func(node* node_ptr, diff_op_t* op_struct)
 
 void dump_pow(node* node_ptr, diff_op_t* op_struct)
 {
+	bool need_p = false;
+	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
+								 && (parent_op == POW)) need_p = true;
+	open_par;
 	dump_node(node_ptr->left);
 	fprint("^{ ");
 	dump_node(node_ptr->right);
 	fprint("} ");
+	close_par;
 }
 
-
+#undef parent_op
+#undef open_par
+#undef close_par
 #undef fprint
+#undef cur_op
 
 void convert_to_pdf()
 {

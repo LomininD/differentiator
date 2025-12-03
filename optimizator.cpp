@@ -25,7 +25,7 @@ void optimize_equation(tree* tree_ptr)
 
 		new_size = tree_ptr->size;
 
-		if (old_size != new_size) dump_intermediate_calculations(tree_ptr);
+		if (old_size != new_size) dump_intermediate_calculations(tree_ptr->root);
 	}
 }
 

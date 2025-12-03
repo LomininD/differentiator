@@ -40,13 +40,13 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 
 	for (int i = 1; i <= diff_times; i++)
 	{
-		dump_start_of_differentiation(tree_ptr_arr[i-1], diff_var);
-
 		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
 		CHECK_ERR(error);
 
+		dump_start_of_differentiation(tree_ptr_arr[i-1]->root, diff_var);
+
 		print_tree_dump(tree_ptr_arr[i], "Differentiated tree view (%d)\n", i);
-		dump_intermediate_calculations(tree_ptr_arr[i]);
+		dump_intermediate_calculations(tree_ptr_arr[i]->root);
 
 		optimize_equation(tree_ptr_arr[i]);
 
@@ -119,6 +119,10 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	};
 
 	CHECK_ERR(NULL);
+
+	dump_start_of_differentiation(current_node_ptr, diff_var);
+	dump_intermediate_calculations(diffed_node);
+	dump_end_of_differentiation();
 
 	printf_debug_msg("differentiate_node: finished process\n");
 
@@ -212,8 +216,8 @@ node* differentiate_var_node(tree* tree_ptr, node* current_node_ptr, char diff_v
 	}
 	else
 	{
-		diffed_node_ptr->type = VAR;
-		diffed_node_ptr->data.variable = current_node_ptr->data.variable;
+		diffed_node_ptr->type = NUM;
+		diffed_node_ptr->data.number = 0;
 	}
 
 	return diffed_node_ptr;
