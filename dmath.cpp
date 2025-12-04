@@ -4,9 +4,11 @@
 #include <math.h>
 #include "tex_dump.h"
 
+
+
 // TODO - remove excess headers
 // TODO - compare normally 
-// TODO - add sqrt, exp
+// TODO - add sqrt
 
 diff_op_t possible_ops[] = {{"+",      ADD,    differentiate_add,    calc_add,     rm_add_sub_node,	  dump_add_sub},
 							{"-",      SUB,    differentiate_sub,    calc_sub,     rm_add_sub_node,   dump_add_sub},
@@ -302,10 +304,6 @@ double calc_arccos(double a, double b)
 }
 
 
-
-
-
-
 bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
 {
 	assert(tree_ptr != NULL);
@@ -318,7 +316,7 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	if ((*neutral_node)->type != NUM) return false;
 
 	bool has_neutral = false;
-	if ((*neutral_node)->data.number == 1)
+	if (is_equal((*neutral_node)->data.number, 1))
 	{
 		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;
@@ -336,7 +334,7 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		*normal_node = NULL;
 		has_neutral = true;
 	}
-	else if ((*neutral_node)->data.number == 0)
+	else if (is_equal((*neutral_node)->data.number, 0))
 	{
 		if (branch_dir == left) 		current_node->parent->left  = *neutral_node;
 		else if (branch_dir == right)   current_node->parent->right = *neutral_node;
@@ -377,7 +375,7 @@ bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, nod
 
 	if ((*neutral_node)->type != NUM) return false;
 
-	if ((*neutral_node)->data.number == 0)
+	if (is_equal((*neutral_node)->data.number, 0))
 	{
 		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;
@@ -407,7 +405,7 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	if ((*neutral_node)->type != NUM) return false;
 
 	bool has_neutral = false;
-	if ((*neutral_node)->data.number == 1 && current_node->right == *neutral_node)
+	if (is_equal((*neutral_node)->data.number, 1) && current_node->right == *neutral_node)
 	{
 		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;
@@ -417,7 +415,7 @@ bool rm_div_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		*normal_node = NULL;
 		has_neutral = true;
 	}
-	else if ((*neutral_node)->data.number == 0)
+	else if (is_equal((*neutral_node)->data.number, 0))
 	{
 		if (*neutral_node == current_node->right)
 		{
@@ -458,7 +456,7 @@ bool rm_pow_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	if ((*neutral_node)->type != NUM) return false;
 
 	bool has_neutral = false;
-	if ((*neutral_node)->data.number == 1)
+	if (is_equal((*neutral_node)->data.number, 1))
 	{
 		if (branch_dir == left) 		current_node->parent->left  = *normal_node;
 		else if (branch_dir == right)   current_node->parent->right = *normal_node;
@@ -468,9 +466,9 @@ bool rm_pow_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 		*normal_node = NULL;
 		has_neutral = true;
 	}
-	else if ((*neutral_node)->data.number == 0)
+	else if (is_equal((*neutral_node)->data.number, 0))
 	{
-		if ((*normal_node)->type == NUM && (*normal_node)->data.number == 0)
+		if ((*normal_node)->type == NUM && is_equal((*normal_node)->data.number, 0))
 		{
 			printf_log_err("[from rm_pow_node] -> zero in base and zero in exponent is forbidden\n");
 			global_err_stat = error;
@@ -538,3 +536,11 @@ bool rm_default_node(tree* tree_ptr, node* current_node, node** normal_node, nod
 	return false;
 }
 
+
+bool is_equal(double a, double b)
+{
+    assert(isfinite(a));
+    assert(isfinite(b));
+
+    return fabs(a - b) < EPSILON; // 10e-3
+}

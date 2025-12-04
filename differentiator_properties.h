@@ -30,5 +30,6 @@ enum diff_ops // FIXME - remove
 #include "tree_properties.h"
 
 #define FORMULA_FILE_NAME "formula.txt" // TODO - remake as command line argument
+const double EPSILON  = 10e-6;
 
 #endif

@@ -7,6 +7,7 @@
 #include "differentiator_funcs.h"
 
 // TODO - fix issue with extra pars in d/dx()
+// TODO - replace vars with numbers
 
 FILE* tex_ptr = NULL;
 const char* output_file_name = "output.tex";
@@ -213,10 +214,10 @@ void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 {
 	bool need_p = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
-								 && (parent_op == MUL  || 
-								 	 parent_op == SUB  || 
-									 (parent_op == POW && 
-									  node_ptr == node_ptr->parent->left))) need_p = true;
+								 && (parent_op == MUL || 
+								 	 parent_op == SUB || 
+								 	 (parent_op == POW && 
+									 node_ptr == node_ptr->parent->left))) need_p = true;
 
 	open_par;
 	dump_node(node_ptr->left);
