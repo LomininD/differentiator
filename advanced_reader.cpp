@@ -4,11 +4,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 #include "dmath.h"
 
 // TODO - check errs
 // TODO - add instructions for binary funcs
-// TODO - add floating point to numbers
 
 
 const int max_func_name_len = 10;
@@ -62,12 +62,15 @@ node* get_number(char** text_buf, size_t* tree_size)
 {
 	assert_errs(NULL);
 	
-	int val = 0;
+	double val = 0;
 	int num_len = 0;
 	bool is_negative = false;
+	bool has_floating_point = false;
+	int after_floating_point = 0;
+
 	puts(*text_buf);
 
-	while(('0' <= **text_buf && **text_buf <= '9') || **text_buf == '-')
+	while(('0' <= **text_buf && **text_buf <= '9') || **text_buf == '-' || ** text_buf == '.')
 	{
 		if (**text_buf == '-')
 		{
@@ -88,8 +91,35 @@ node* get_number(char** text_buf, size_t* tree_size)
 				return NULL;
 			}
 		}
-		val = val * 10 + (**text_buf - '0');
-		(*text_buf)++;
+
+		if (**text_buf == '.')
+		{
+			if (!has_floating_point) 
+			{
+				has_floating_point = true;
+				(*text_buf)++;
+			}
+			else 
+			{
+				printf_log_err("[from get_number] -> got wrong floating point in number\n");
+				read_error = true;
+				return NULL;
+			}
+		}
+
+		if (has_floating_point)
+		{
+			after_floating_point++;
+			val = val + (double) (**text_buf - '0') / pow(10.0, after_floating_point);
+			printf("%lg\n", val);
+		}
+		else 
+		{
+			val = val * 10.0 + (double) (**text_buf - '0');
+			printf("%lg\n", val);
+		}
+
+		(*text_buf)++; 
 		num_len++;
 	} 
 
