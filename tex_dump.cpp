@@ -6,6 +6,8 @@
 #include <time.h>
 #include "differentiator_funcs.h"
 
+// TODO - fix issue with extra pars in d/dx()
+
 FILE* tex_ptr = NULL;
 const char* output_file_name = "output.tex";
 const char* open_file_cmd = "open output.pdf";
@@ -85,6 +87,7 @@ void dump_end_main_equation_preamble()
 
 
 #define cur_op node_ptr->data.operation
+#define parent_op node_ptr->parent->data.operation
 
 void dump_node(node* node_ptr)
 {
@@ -95,7 +98,7 @@ void dump_node(node* node_ptr)
 	switch(node_ptr->type)
 	{
 		case NUM:
-			if (node_ptr->data.number < 0 && node_ptr->parent != NULL) need_p = true;
+			if (node_ptr->data.number < 0 && (node_ptr->parent != NULL && parent_op != DIV)) need_p = true;
 			if (need_p) fprint("\\left( ");
 			fprint("%lg ", node_ptr->data.number);
 			if (need_p) fprint("\\right) ");
@@ -172,14 +175,16 @@ void close_tex_file()
 
 #define open_par  if (need_p) fprint("\\left( ")
 #define close_par if (need_p) fprint("\\right) ")
-#define parent_op node_ptr->parent->data.operation
 #define check_for_outer_pars if (node_ptr->parent == NULL) need_p = false
 
 void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 {
 	bool need_p = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
-								 && (parent_op == MUL || parent_op == SUB)) need_p = true;
+								 && (parent_op == MUL  || 
+								 	 parent_op == SUB  || 
+									 (parent_op == POW && 
+									  node_ptr == node_ptr->parent->left))) need_p = true;
 
 	open_par;
 	dump_node(node_ptr->left);
@@ -196,7 +201,8 @@ void dump_mul(node* node_ptr, diff_op_t* op_struct)
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
 								 && (parent_op == MUL || 
 								 	 parent_op == ADD || 
-									 parent_op == SUB)) need_p = false;
+									 parent_op == SUB ||
+									 parent_op == DIV)) need_p = false;
 
 	// if (node_ptr->right->type == NUM || 
 	// 			(node_ptr->right->data.operation == MUL && 
@@ -221,14 +227,19 @@ void dump_div(node* node_ptr, diff_op_t* op_struct)
 void dump_unary_func(node* node_ptr, diff_op_t* op_struct)
 {
 	bool need_p = false;
-	fprint("\\%s{ ", op_struct->name);
+	bool func_needs_p = false;
+
+	if (node_ptr->parent != NULL && parent_op == POW) func_needs_p = true;
 	if (node_ptr->right->type == OP) need_p = true;
+	if (func_needs_p) fprint("\\left( ");
+	fprint("\\%s{ ", op_struct->name);
 
 	open_par;
 	dump_node(node_ptr->right);
 	close_par;
 
 	fprint("} ");
+	if (func_needs_p) fprint("\\right) ");
 }
 
 void dump_pow(node* node_ptr, diff_op_t* op_struct)

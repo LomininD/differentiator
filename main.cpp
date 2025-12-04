@@ -8,8 +8,6 @@
 
 #define USE_ADVANCED_READER
 
-
-
 int main()
 {
     initialize_log("differentiator_log.html", "DIFFERENTIATOR LOG");
@@ -22,7 +20,8 @@ int main()
     err_t formula_ok = advanced_read_formula(main_tree_ptr);
     # else
     err_t formula_ok = read_formula(main_tree_ptr);
-    #endif
+    # endif
+    
     if (formula_ok != ok) return 0;
 
     fill_main_equation_preamble(main_tree_ptr);

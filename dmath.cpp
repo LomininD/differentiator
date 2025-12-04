@@ -5,15 +5,21 @@
 #include "tex_dump.h"
 
 // TODO - remove excess headers
+// TODO - compare normally 
+// TODO - add sqrt, exp
 
-diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_sub_node,	dump_add_sub},
-							{"-",   SUB, differentiate_sub,   calc_sub,  rm_add_sub_node, 	dump_add_sub},
-							{"*",   MUL, differentiate_mul,   calc_mul,  rm_mul_node,		dump_mul},
-							{"/",   DIV, differentiate_div,   calc_div,  rm_div_node,		dump_div},
-							{"sin", SIN, differentiate_sin,   calc_sin,  rm_default_node, 	dump_unary_func},
-							{"cos", COS, differentiate_cos,   calc_cos,  rm_default_node, 	dump_unary_func},
-							{"^",   POW, differentiate_pow,   calc_pow,  rm_pow_node, 		dump_pow},
-							{"ln",  LN,  differentiate_ln,    calc_ln,   rm_default_node, 	dump_unary_func}};
+diff_op_t possible_ops[] = {{"+",      ADD,    differentiate_add,    calc_add,     rm_add_sub_node,	  dump_add_sub},
+							{"-",      SUB,    differentiate_sub,    calc_sub,     rm_add_sub_node,   dump_add_sub},
+							{"*",      MUL,    differentiate_mul,    calc_mul,     rm_mul_node,		  dump_mul},
+							{"/",      DIV,    differentiate_div,    calc_div,     rm_div_node,		  dump_div},
+							{"^",      POW,    differentiate_pow,    calc_pow,     rm_pow_node, 	  dump_pow},
+							{"ln",     LN,     differentiate_ln,     calc_ln,      rm_default_node,   dump_unary_func},
+							{"sin",    SIN,    differentiate_sin,    calc_sin,     rm_default_node,   dump_unary_func},
+							{"cos",    COS,    differentiate_cos,    calc_cos,     rm_default_node,   dump_unary_func},
+							{"tg",     TG,     differentiate_tg,     calc_tg,      rm_default_node,   dump_unary_func},
+							{"ctg",    CTG,    differentiate_ctg,    calc_ctg,     rm_default_node,   dump_unary_func},
+							{"arcsin", ARCSIN, differentiate_arcsin, calc_arcsin,  rm_default_node,   dump_unary_func},
+							{"arccos", ARCCOS, differentiate_arccos, calc_arccos,  rm_default_node,   dump_unary_func}};
 
 
 #define assert_args assert(tree_ptr != NULL); assert(current_node_ptr != NULL)
@@ -24,7 +30,7 @@ diff_op_t possible_ops[] = {{"+",   ADD, differentiate_add,   calc_add,  rm_add_
 #define to_op(CMD)  (union data_t){.operation = CMD}
 #define to_num(NUM) (union data_t){.number = NUM}
 #define non(OPERATION, LEFT, RIGHT) create_and_initialise_node(OP, to_op(OPERATION), LEFT, RIGHT, NULL)
-#define nnn(NUMBER, LEFT, RIGHT) create_and_initialise_node(NUM, to_num(NUMBER), LEFT, RIGHT, NULL)
+#define nnn(NUMBER) create_and_initialise_node(NUM, to_num(NUMBER), NULL, NULL, NULL)
 #define compound_func(EXP, INSIDE_FUNC) non(MUL, EXP, d(INSIDE_FUNC))
 // TODO - remove left right
 
@@ -64,27 +70,7 @@ node* differentiate_div(tree* tree_ptr, node* current_node_ptr, char diff_var)
 							 non(MUL, c(l_subtr), d(r_subtr))), 
 				   	non(POW, 
 							 c(r_subtr), 
-							 nnn(2, NULL, NULL)));
-}
-
-node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var)
-{
-	assert_args;
-
-	tree_ptr->size += 2;
-	return compound_func(non(COS, NULL, c(r_subtr)), 
-						 r_subtr);
-}
-
-node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
-{
-	assert_args;
-
-	tree_ptr->size += 4;
-	return compound_func(non(MUL, 
-								  nnn(-1, NULL, NULL), 
-								  non(SIN, NULL, c(r_subtr))), 
-						 r_subtr);
+							 nnn(2)));
 }
 
 node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
@@ -123,7 +109,7 @@ node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
 								 			  c(l_subtr), 
 								 			  non(SUB, 
 										  			   c(r_subtr), 
-										  			   nnn(1, NULL, NULL)))), 
+										  			   nnn(1)))), 
 							 current_node_ptr->left);
 
 	}
@@ -151,9 +137,92 @@ node* differentiate_ln(tree* tree_ptr, node* current_node_ptr, char diff_var)
 
 	tree_ptr->size += 3;
 	return compound_func(non(DIV, 
-								  nnn(1, NULL, NULL), 
-								  c(current_node_ptr->right)),   
-						 current_node_ptr->right);
+								  nnn(1), 
+								  c(r_subtr)),   
+						 r_subtr);
+}
+
+
+node* differentiate_sin(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 2;
+	return compound_func(non(COS, NULL, c(r_subtr)), 
+						 r_subtr);
+}
+
+node* differentiate_cos(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 4;
+	return compound_func(non(MUL, 
+								  nnn(-1), 
+								  non(SIN, NULL, c(r_subtr))), 
+						 r_subtr);
+}
+
+
+node* differentiate_tg(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 6;
+	return compound_func(non(DIV,
+								  nnn(1),
+								  non(POW,
+								  		   non(COS, NULL, c(r_subtr)),
+										   nnn(2))),
+						 r_subtr);
+}
+
+node* differentiate_ctg(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 6;
+	return compound_func(non(DIV,
+								  nnn(-1),
+								  non(POW,
+								  		   non(SIN, NULL, c(r_subtr)),
+										   nnn(2))),
+						 r_subtr);
+}
+
+node* differentiate_arcsin(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 9;
+	return compound_func(non(DIV,
+								  nnn(1),
+								  non(POW,
+								  		   non(SUB, 
+										   			nnn(1),
+													non(POW,
+															 c(r_subtr),
+															 nnn(2))),
+										   nnn(0.5))),
+						 r_subtr);
+}
+
+
+node* differentiate_arccos(tree* tree_ptr, node* current_node_ptr, char diff_var)
+{
+	assert_args;
+
+	tree_ptr->size += 9;
+	return compound_func(non(DIV,
+								  nnn(-1),
+								  non(POW,
+								  		   non(SUB, 
+										   			nnn(1),
+													non(POW,
+															 c(r_subtr),
+															 nnn(2))),
+										   nnn(0.5))),
+						 r_subtr);
 }
 
 
@@ -189,6 +258,16 @@ double calc_div(double a, double b)
 	return a / b;
 }
 
+double calc_pow(double a, double b)
+{
+	return pow(a, b);
+}
+
+double calc_ln(double a, double b)
+{
+	return log(b);
+}
+
 double calc_sin(double a, double b)
 {
 	return sin(b);
@@ -199,15 +278,27 @@ double calc_cos(double a, double b)
 	return cos(b);
 }
 
-double calc_pow(double a, double b)
+double calc_tg(double a, double b)
 {
-	return pow(a, b);
+	return tan(b);
 }
 
-double calc_ln(double a, double b)
+double calc_ctg(double a, double b)
 {
-	return log(b);
+	return 1.0 / tan(b);
 }
+
+double calc_arcsin(double a, double b)
+{
+	return asin(b);
+}
+
+double calc_arccos(double a, double b)
+{
+	return acos(b);
+}
+
+
 
 
 

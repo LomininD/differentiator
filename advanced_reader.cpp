@@ -7,6 +7,9 @@
 #include "dmath.h"
 
 // TODO - check errs
+// TODO - add instructions for binary funcs
+// TODO - add floating point to numbers
+
 
 const int max_func_name_len = 10;
 
@@ -174,6 +177,7 @@ node* get_func(char** text_buf, size_t* tree_size, char* func_name)
 
 	for (int i = 0; i < op_count; i++)
 	{
+		//printf("%s %s\n", func_name, possible_ops[i].name);
 		if (strcmp(func_name, possible_ops[i].name) == 0)
 		{
 			found_func = 1;

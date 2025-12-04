@@ -13,10 +13,15 @@ enum diff_ops // FIXME - remove
 	SUB,
 	MUL,
 	DIV,
-	SIN,
-	COS,
 	POW,
 	LN,
+	SIN,
+	COS,
+	TG,
+	CTG,
+	ARCSIN,
+	ARCCOS,
+
 
 	op_count
 };
