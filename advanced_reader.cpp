@@ -94,7 +94,7 @@ node* get_number(char** text_buf, size_t* tree_size)
 
 		if (**text_buf == '.')
 		{
-			if (!has_floating_point) 
+			if (!has_floating_point && num_len > 0) 
 			{
 				has_floating_point = true;
 				(*text_buf)++;
@@ -143,7 +143,7 @@ node* get_var(size_t* tree_size, char* word)
 	if (word[1] == '\0')
 	{
     	var_name = word[0];
-		name_table[hash_var(var_name)].var = var_name;
+		if (!is_preset(var_name)) name_table[hash_var(var_name)].var = var_name;
 		free(word);
 	}
 	else

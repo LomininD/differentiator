@@ -8,6 +8,7 @@
 #include "dmath.h"
 
 const int name_table_size = 26;
+const int preset_names_num = 1;
 
 struct name_record
 {
@@ -16,6 +17,7 @@ struct name_record
 };
 
 extern name_record name_table[];
+extern name_record preset_names[];
 
 
 void print_menu();
@@ -30,6 +32,7 @@ double calculate_node(tree* tree_ptr, node* current_node);
 bool check_for_diff_var(node* current_node_ptr, char diff_var);
 
 int hash_var(char var);
+bool is_preset(char var);
 
 node* differentiate_number_node(tree* tree_ptr, node* current_node_ptr);
 node* differentiate_var_node(tree* tree_ptr, node* current_node_ptr, char diff_var);

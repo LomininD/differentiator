@@ -2,15 +2,18 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "tex_dump.h"
+#include <math.h>
 
+#ifndef M_E
+#define M_E 2.718281
+#endif
 
 name_record name_table[name_table_size] = {};
+name_record preset_names[preset_names_num] = {{'e', M_E}};
 
-// static void write_node(FILE* save_ptr, const tree* tree, const node* current_node);
-// static err_t process_saving(const tree* tree);
-// static err_t process_loading(tree* tree);
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
 static double calculate_value(node* node_ptr);
+static bool determine_var_value(char var, name_record var_table[], int table_size, double* value);
 
 
 void print_menu()
@@ -26,18 +29,34 @@ void print_menu()
 }
 
 
+
+
+
 void ask_for_variable_values()
 {
 	for (int i = 0; i < name_table_size; i++)
 	{
 		if (name_table[i].var != 0)
 		{
+			if (is_preset(name_table[i].var)) continue;
 			printf_both("-> Enter %c value:\n", name_table[i].var);
 			double value = request_number();
 			name_table[i].value  = value;
 		}
 	}
 }
+
+
+bool is_preset(char var)
+{
+	for (int i = 0; i < preset_names_num; i++)
+	{
+		if (var == preset_names[i].var)
+			return true;
+	}
+	return false;
+}
+
 
 err_t process_calculating_value(node* root_node)
 {
@@ -65,20 +84,16 @@ double calculate_value(node* node_ptr)
 	if (TYPE == NUM) return node_ptr->data.number;
 
 	bool found_var = false;
+	double value = 0;
 
 	if (TYPE == VAR)
 	{
-		for (int i = 0; i < name_table_size; i++)
-		{
-			// printf("%c %c\n", node_ptr->data.variable, name_table[i].var);
-			if (node_ptr->data.variable == name_table[i].var)
-			{
-				found_var = true;
-				return name_table[i].value;
-			}
-		}
-
-		if (!found_var)
+		found_var = determine_var_value(node_ptr->data.variable, preset_names, preset_names_num, &value);
+		if (found_var) return value;
+		
+		found_var = determine_var_value(node_ptr->data.variable, name_table, name_table_size, &value);
+		if (found_var) return value;
+		else
 		{
 			printf_log_err("[from calculate_value] -> uninitialised variable\n");
 			global_err_stat = error;
@@ -106,6 +121,20 @@ double calculate_value(node* node_ptr)
 }
 
 #undef TYPE
+
+
+bool determine_var_value(char var, name_record var_table[], int table_size, double* value)
+{
+	for (int i = 0; i < table_size; i++)
+	{
+		if (var == var_table[i].var)
+		{
+			*value =  var_table[i].value;
+			return true;
+		}
+	}
+	return false;
+}
 
 
 err_t process_calculating_partial_derivative(tree* tree_ptr)
