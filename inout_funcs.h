@@ -21,7 +21,7 @@ enum ans_t
 };
 
 cmd_t get_cmd();
-int get_number();
+double request_number();
 ans_t get_answer();
 char* request_string();
 char get_var_name();

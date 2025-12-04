@@ -69,16 +69,16 @@ char get_var_name()
 }
 
 
-int get_number()
+double request_number()
 {
     bool got_ans = false;
-    int ans = 0;
+    double ans = 0;
 
     while (!got_ans)
     {
-        int scanned = scanf("%d", &ans);
+        int scanned = scanf("%lg", &ans);
 
-        printf_debug_msg("got %d\n", ans);
+        printf_debug_msg("got %lg\n", ans);
 
         if (scanned != 1 || !check_buffer())
         {

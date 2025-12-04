@@ -10,6 +10,7 @@ name_record name_table[name_table_size] = {};
 // static err_t process_saving(const tree* tree);
 // static err_t process_loading(tree* tree);
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
+static double calculate_value(node* node_ptr);
 
 
 void print_menu()
@@ -25,6 +26,87 @@ void print_menu()
 }
 
 
+void ask_for_variable_values()
+{
+	for (int i = 0; i < name_table_size; i++)
+	{
+		if (name_table[i].var != 0)
+		{
+			printf_both("-> Enter %c value:\n", name_table[i].var);
+			double value = request_number();
+			name_table[i].value  = value;
+			break;
+		}
+	}
+}
+
+err_t process_calculating_value(node* root_node)
+{
+	assert(root_node != NULL);
+	printf_debug_msg("process_calculating_value: began process\n");
+
+	double total_value = calculate_value(root_node);
+	CHECK_ERR(error);
+
+	printf_both("Function value is %lg\n", total_value);
+
+	printf_debug_msg("process_calculating_value: finished process\n");
+
+	return ok;
+}
+
+#define TYPE node_ptr->type
+
+double calculate_value(node* node_ptr)
+{
+	if (node_ptr == NULL) return ok;
+
+	if (TYPE == NUM) return node_ptr->data.number;
+
+	bool found_var = false;
+
+	if (TYPE == VAR)
+	{
+		for (int i = 0; i < name_table_size; i++)
+		{
+			// printf("%c %c\n", node_ptr->data.variable, name_table[i].var);
+			if (node_ptr->data.variable == name_table[i].var)
+			{
+				found_var = true;
+				return name_table[i].value;
+			}
+		}
+
+		if (!found_var)
+		{
+			printf_log_err("[from calculate_value] -> uninitialised variable\n");
+			global_err_stat = error;
+			return 0; 
+		}
+	}
+
+	if (TYPE == OP)
+	{
+		double left_val = calculate_value(node_ptr->left);
+		CHECK_ERR(0);
+		double right_val = calculate_value(node_ptr->right);
+		CHECK_ERR(0);
+
+		for (int i = 0; i < op_count; i++)
+		{
+			if (node_ptr->data.operation == possible_ops[i].op)
+			{
+				return (*possible_ops[i].math_func)(left_val, right_val);
+			}
+		}
+	}
+
+	return -1;
+}
+
+#undef TYPE
+
+
 err_t process_calculating_partial_derivative(tree* tree_ptr)
 {
 	assert(tree_ptr != NULL);
@@ -35,7 +117,7 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 	char diff_var = get_var_name();
 
 	printf_both("-> Enter number of times to differentiate:\n");
-	int diff_times = get_number();
+	int diff_times = (int) request_number();
 
 	tree* tree_ptr_arr[100] = {}; // TODO - make dynamic
 	tree_ptr_arr[0] = tree_ptr;

@@ -19,6 +19,8 @@ extern name_record name_table[];
 
 
 void print_menu();
+void ask_for_variable_values();
+err_t process_calculating_value(node* root_node);
 err_t process_calculating_partial_derivative(tree* tree_ptr);
 node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
 const char* decode_operation_type_enum(diff_ops op);

@@ -21,21 +21,28 @@ int main()
     # else
     err_t formula_ok = read_formula(main_tree_ptr);
     # endif
-    
+
     if (formula_ok != ok) return 0;
 
     fill_main_equation_preamble(main_tree_ptr);
     optimize_equation(main_tree_ptr);
     dump_end_main_equation_preamble();
 
+    ask_for_variable_values();
+
     dump_name_table();
 
-    //bool end = false;
+    process_calculating_value(main_tree_ptr->root);
+
+
+    // calculate_tree() // should require only tree and be able to be placed in any part of program
+
 
     fill_derivative_preamble();
 
     process_calculating_partial_derivative(main_tree_ptr);
 
+    //bool end = false;
 //     while(!end)
 //     {
 //         print_menu();
