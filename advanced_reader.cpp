@@ -1,16 +1,24 @@
 #include "reader.h"
 #include "advanced_reader.h"
 #include "differentiator_funcs.h"
+#include <string.h>
+#include <stdlib.h>
+#include <assert.h>
+#include "dmath.h"
 
 // TODO - check errs
+
+const int max_func_name_len = 10;
 
 bool read_error;
 node* get_general_tree(char** text_buf, size_t* tree_size);
 node* get_expression(char** text_buf, size_t* tree_size);
 node* get_term(char** text_buf, size_t* tree_size);
 node* get_power(char** text_buf, size_t* tree_size);
+node* get_func(char** text_buf, size_t* tree_size, char* func_name);
 node* get_parenthesis(char** text_buf, size_t* tree_size);
-node* get_var(char** text_buf, size_t* tree_size);
+node* get_var(size_t* tree_size, char* word);
+char* get_word(char** text_buf);
 node* get_number(char** text_buf, size_t* tree_size);
 
 #define assert_errs(RET) if (read_error) return RET;
@@ -60,12 +68,15 @@ node* get_number(char** text_buf, size_t* tree_size)
 	{
 		if (**text_buf == '-')
 		{
-			if (!is_neagtive && num_len == 0)
+			if (!is_neagtive)
 			{
-				is_neagtive = true;
-				printf("negative\n");
-				(*text_buf)++;
-				continue;
+				if (num_len == 0)
+				{
+					is_neagtive = true;
+					(*text_buf)++;
+					continue;
+				}
+				else break;
 			}
 			else
 			{
@@ -89,28 +100,125 @@ node* get_number(char** text_buf, size_t* tree_size)
 }
 
 
-node* get_var(char** text_buf, size_t* tree_size)
+node* get_var(size_t* tree_size, char* word)
 {
 	assert_errs(NULL);
+	assert(word != NULL);
 
 	char var_name = 0;
 
-	if ('a' <= **text_buf && **text_buf <= 'z')
+	if (word[1] == '\0')
 	{
-		var_name = **text_buf;
-    	name_table[hash_var(var_name)].var = var_name;
+    	var_name = word[0];
+		name_table[hash_var(var_name)].var = var_name;
+		free(word);
 	}
 	else
 	{
-		printf_log_err("[from get_var] -> cannot recognize variable name\n");
+		printf_log_err("[from get_var] -> variable name is too big\n");
+		free(word);
 		read_error = true;
 		return NULL;
 	}
 
-	(*text_buf)++;
-	skip_spaces(text_buf);
 	node* new_node = create_and_initialise_node(VAR, (union data_t){.variable = var_name}, NULL, NULL, NULL);
 	(*tree_size)++;
+	return new_node;
+}
+
+
+char* get_word(char** text_buf)
+{
+	assert_errs(NULL);
+
+	char word[max_func_name_len + 1] = {};
+	int word_len = 0;
+
+	while ('a' <= **text_buf && **text_buf <= 'z' && word_len < max_func_name_len + 1)
+	{
+		word[word_len] = **text_buf;
+		word_len++;
+		(*text_buf)++;
+	}
+
+	if (word_len == max_func_name_len + 1)
+	{
+		printf_log_err("[from get_word] -> word is too long\n");
+		read_error = true;
+		return NULL;
+	} 
+
+	if (word_len == 0) 
+	{
+		printf_log_err("[from get_word] -> cannot recognize the word\n");
+		read_error = true;
+		return NULL;
+	}
+
+	skip_spaces(text_buf);
+	puts(*text_buf);
+	puts(word);
+	return strdup(word);
+}
+
+
+node* get_func(char** text_buf, size_t* tree_size, char* func_name)
+{
+	assert_errs(NULL);
+
+	assert_errs(NULL);
+	if (func_name == NULL) return NULL;
+
+	bool found_func = false;
+	node* new_node = NULL;
+
+	for (int i = 0; i < op_count; i++)
+	{
+		if (strcmp(func_name, possible_ops[i].name) == 0)
+		{
+			found_func = 1;
+
+			free(func_name);
+
+			skip_spaces(text_buf);
+
+			node* exp_node = NULL;
+
+			if (**text_buf == '(')
+			{
+				(*text_buf)++;
+				skip_spaces(text_buf);
+				exp_node = get_expression(text_buf, tree_size);
+				assert_errs(NULL);
+			}
+			else
+			{
+				printf_log_err("[from get_func] -> no opening parenthesis\n");
+				read_error = true;
+				return NULL;
+			}
+
+			skip_spaces(text_buf);
+
+			if (**text_buf != ')')
+			{
+				printf_log_err("[from get_func] -> no closing parenthesis\n");
+				read_error = true;
+				return NULL;
+			}
+
+			(*text_buf)++;
+			skip_spaces(text_buf);
+
+			new_node = create_and_initialise_node(OP, (union data_t){.operation = possible_ops[i].op}, NULL, exp_node, NULL);
+			exp_node->parent = new_node;
+			(*tree_size)++;
+			break;
+		}
+	}
+
+	if (!found_func) return NULL;
+
 	return new_node;
 }
 
@@ -140,7 +248,19 @@ node* get_parenthesis(char** text_buf, size_t* tree_size)
 	{
 		node* new_node = get_number(text_buf, tree_size);
 		assert_errs(NULL);
-		if (new_node == NULL) new_node = get_var(text_buf, tree_size);
+
+		if (new_node == NULL) 
+		{
+			char* word = get_word(text_buf);
+			assert_errs(NULL);
+
+			new_node = get_func(text_buf, tree_size, word);
+			assert_errs(NULL);
+
+			if (new_node == NULL) new_node = get_var(tree_size, word);
+
+		}
+
 		return new_node;
 	}
 }
@@ -247,6 +367,9 @@ node* get_power(char** text_buf, size_t* tree_size)
 }
 
 
+
+
+
 node* get_general_tree(char** text_buf, size_t* tree_size)
 {
 	assert_errs(NULL);
@@ -258,7 +381,7 @@ node* get_general_tree(char** text_buf, size_t* tree_size)
 
 	if (**text_buf != '$')
 	{
-		printf_log_err("[from get_general_tree] -> no $ in the end of file");
+		printf_log_err("[from get_general_tree] -> no $ in the end of file\n");
 	}
 
 	(*text_buf)++;

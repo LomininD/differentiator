@@ -177,11 +177,9 @@ void close_tex_file()
 
 void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 {
-	bool need_p = true;
+	bool need_p = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
-								 && (parent_op == DIV || parent_op == ADD)) need_p = false;
-
-	check_for_outer_pars;
+								 && (parent_op == MUL || parent_op == SUB)) need_p = true;
 
 	open_par;
 	dump_node(node_ptr->left);
@@ -222,8 +220,14 @@ void dump_div(node* node_ptr, diff_op_t* op_struct)
 
 void dump_unary_func(node* node_ptr, diff_op_t* op_struct)
 {
+	bool need_p = false;
 	fprint("\\%s{ ", op_struct->name);
+	if (node_ptr->right->type == OP) need_p = true;
+
+	open_par;
 	dump_node(node_ptr->right);
+	close_par;
+
 	fprint("} ");
 }
 
