@@ -35,7 +35,6 @@ void ask_for_variable_values()
 			printf_both("-> Enter %c value:\n", name_table[i].var);
 			double value = request_number();
 			name_table[i].value  = value;
-			break;
 		}
 	}
 }
@@ -49,6 +48,8 @@ err_t process_calculating_value(node* root_node)
 	CHECK_ERR(error);
 
 	printf_both("Function value is %lg\n", total_value);
+
+	dump_calculating_expression_value(root_node, total_value);
 
 	printf_debug_msg("process_calculating_value: finished process\n");
 

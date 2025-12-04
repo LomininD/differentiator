@@ -14,6 +14,7 @@ const char* open_file_cmd = "open output.pdf";
 
 static void dump_node(node* node_ptr);
 static void dump_vars();
+static void dump_var_values();
 
 const char* phrase_bank[] = {"Любой уважающий себя синус трепыхается от -1 до 1.",
 							 "Это выражение из логарифмов ни уму ни сердцу ничего не говорит",
@@ -82,7 +83,35 @@ void dump_vars()
 void dump_end_main_equation_preamble()
 {
 	fprint("\n\\end{dmath*}\n");
-	fprint("Расчехляем дифференциатор и начинаем считать.\n");
+	fprint("Расчехляем дифференциатор и начинаем считать.\n\n");
+}
+
+void dump_calculating_expression_value(node* node_ptr, double value)
+{
+	fprint("Посчитаем значение выражения: \n\n");
+
+	dump_var_values();
+
+	fprint("\\begin{dmath*}\n");
+
+	dump_node(node_ptr);
+
+	fprint("= %lg\n", value);
+
+	fprint("\\end{dmath*}\n\n");
+}
+
+void dump_var_values()
+{
+	fprint("\\begin{gather*}\n");
+	for (int i = 0; i < name_table_size; i++)
+	{
+		if (name_table[i].var != 0)
+		{
+			fprint("%c = %lg \\\\ \n", name_table[i].var, name_table[i].value);
+		}
+	}
+	fprint("\\end{gather*}\n\n");
 }
 
 

@@ -7,6 +7,7 @@
 void initialise_tex_file();
 void fill_main_equation_preamble(tree* tree_ptr);
 void dump_end_main_equation_preamble();
+void dump_calculating_expression_value(node* node_ptr, double value);
 
 void fill_derivative_preamble();
 void dump_start_of_differentiation(node* node_ptr, char diff_var);
