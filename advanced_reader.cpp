@@ -61,18 +61,18 @@ node* get_number(char** text_buf, size_t* tree_size)
 	
 	int val = 0;
 	int num_len = 0;
-	bool is_neagtive = false;
+	bool is_negative = false;
 	puts(*text_buf);
 
 	while(('0' <= **text_buf && **text_buf <= '9') || **text_buf == '-')
 	{
 		if (**text_buf == '-')
 		{
-			if (!is_neagtive)
+			if (!is_negative)
 			{
 				if (num_len == 0)
 				{
-					is_neagtive = true;
+					is_negative = true;
 					(*text_buf)++;
 					continue;
 				}
@@ -94,7 +94,7 @@ node* get_number(char** text_buf, size_t* tree_size)
 	
 	skip_spaces(text_buf);
 	node* new_node = create_and_initialise_node(NUM, (union data_t){.number = val}, NULL, NULL, NULL);
-	if (is_neagtive) new_node->data.number *= -1;
+	if (is_negative) new_node->data.number *= -1;
 	(*tree_size)++;
 	return new_node;
 }

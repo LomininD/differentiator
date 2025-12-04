@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include "tex_dump.h"
 
+#define USE_ADVANCED_READER
+
+
 
 int main()
 {
@@ -15,7 +18,11 @@ int main()
     tree* main_tree_ptr = tree_ctor();
     if (global_err_stat != ok) return 0;
 
+    # if defined(USE_ADVANCED_READER)
     err_t formula_ok = advanced_read_formula(main_tree_ptr);
+    # else
+    err_t formula_ok = read_formula(main_tree_ptr);
+    #endif
     if (formula_ok != ok) return 0;
 
     fill_main_equation_preamble(main_tree_ptr);
