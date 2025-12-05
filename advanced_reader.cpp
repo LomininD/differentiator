@@ -68,7 +68,7 @@ node* get_number(char** text_buf, size_t* tree_size)
 	bool has_floating_point = false;
 	int after_floating_point = 0;
 
-	puts(*text_buf);
+	//puts(*text_buf);
 
 	while(('0' <= **text_buf && **text_buf <= '9') || **text_buf == '-' || ** text_buf == '.')
 	{
@@ -189,8 +189,8 @@ char* get_word(char** text_buf)
 	}
 
 	skip_spaces(text_buf);
-	puts(*text_buf);
-	puts(word);
+	//puts(*text_buf);
+	//puts(word);
 	return strdup(word);
 }
 

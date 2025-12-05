@@ -32,7 +32,7 @@ const char* phrase_bank[] = {"Любой уважающий себя синус 
 							 "Этим дрючат студентов на третьем курсе, но это очень лёгкая вещь. Вот смотрите:",
 							 "Подставили интеграл -- всё, трах-тарарах, скончалось!",
 							 "Вы ещё скажите спасибо, что умножение коммутативно",
-							 "Переменную интегрирования можно обозначить любой буквой: $x$, $y$, ъ... ",
+							 "Переменную интегрирования можно обозначить любой буквой: $x$, $y$, й... ",
 							 "Вот такой вот беспредельный монстр функция Дирихле: не имеет предела ни в одной точке",
 							 "Ну всё, п***ц \\textit{(© A. Скубачевский)}",
 							 "Так, я же нигде не обосрался? \\textit{(© A. Скубачевский)}",
@@ -250,11 +250,16 @@ void dump_mul(node* node_ptr, diff_op_t* op_struct)
 
 void dump_div(node* node_ptr, diff_op_t* op_struct)
 {
+	bool need_p = false;
+	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
+								 && (parent_op == POW)) need_p = true;
+	open_par;		 
 	fprint("\\frac{ ");
 	dump_node(node_ptr->left);
 	fprint("}{ ");
 	dump_node(node_ptr->right);
 	fprint("} ");
+	close_par;
 }
 
 void dump_unary_func(node* node_ptr, diff_op_t* op_struct)

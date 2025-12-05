@@ -19,6 +19,7 @@ extern diff_op_t possible_ops[];
 
 
 bool is_equal(double a, double b);
+bool check_data_equality(node* node_ptr, double b);
 
 node* differentiate_add   (tree* tree_ptr, node* current_node_ptr, char diff_var);
 node* differentiate_sub   (tree* tree_ptr, node* current_node_ptr, char diff_var);
