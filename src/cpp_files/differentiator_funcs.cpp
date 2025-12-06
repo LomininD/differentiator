@@ -1,8 +1,8 @@
-#include "differentiator_funcs.h"
 #include <stdlib.h>
 #include <assert.h>
-#include "tex_dump.h"
 #include <math.h>
+#include "../header_files/differentiator_funcs.h"
+#include "../header_files/tex_dump.h"
 
 #ifndef M_E
 #define M_E 2.718281

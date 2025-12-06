@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include "differentiator_funcs.h"
-#include "tree_funcs.h"
-#include "reader.h"
-#include "advanced_reader.h"
 #include <stdlib.h>
-#include "tex_dump.h"
+#include "../header_files/differentiator_funcs.h"
+#include "../header_files/tree_funcs.h"
+#include "../header_files/reader.h"
+#include "../header_files/advanced_reader.h"
+#include "../header_files/tex_dump.h"
 
 #define USE_ADVANCED_READER
 

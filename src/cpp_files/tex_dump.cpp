@@ -1,10 +1,10 @@
-#include "tex_dump.h"
-#include <stdlib.h>
-#include "tree_funcs.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <time.h>
-#include "differentiator_funcs.h"
+#include <stdlib.h>
+#include "../header_files/tex_dump.h"
+#include "../header_files/tree_funcs.h"
+#include "../header_files/differentiator_funcs.h"
 
 // TODO - fix issue with extra pars in d/dx()
 // TODO - replace vars with numbers

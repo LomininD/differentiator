@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdarg.h>
-#include "tree_dump.h"
-#include "tree_funcs.h"
-#include "differentiator_funcs.h"
+#include "../header_files/tree_dump.h"
+#include "../header_files/tree_funcs.h"
+#include "../header_files/differentiator_funcs.h"
 
 size_t node_count = 0;
 

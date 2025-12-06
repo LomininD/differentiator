@@ -1,11 +1,11 @@
-#include "reader.h"
-#include "advanced_reader.h"
-#include "differentiator_funcs.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include "dmath.h"
+#include "../header_files/reader.h"
+#include "../header_files/advanced_reader.h"
+#include "../header_files/differentiator_funcs.h"
+#include "../header_files/dmath.h"
 
 // TODO - check errs
 // TODO - add instructions for binary funcs

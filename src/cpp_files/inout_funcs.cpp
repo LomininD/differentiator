@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "inout_funcs.h"
+#include "../header_files/inout_funcs.h"
 
 
 static void clear_buffer(void);

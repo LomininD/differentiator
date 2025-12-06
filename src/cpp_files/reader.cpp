@@ -1,12 +1,12 @@
-#include "reader.h"
-#include "tree_funcs.h"
-#include "differentiator_funcs.h"
-#include "dmath.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+#include "../header_files/reader.h"
+#include "../header_files/tree_funcs.h"
+#include "../header_files/differentiator_funcs.h"
+#include "../header_files/dmath.h"
 
 static node* read_node(char** current_pos, size_t* node_count, err_t* read_error);
 static err_t parse_node_data(node* new_node, char* string);

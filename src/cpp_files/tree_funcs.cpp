@@ -1,6 +1,6 @@
-#include "tree_funcs.h"
 #include <stdlib.h>
 #include <assert.h>
+#include "../header_files/tree_funcs.h"
 
 extern err_t global_err_stat;
 

@@ -1,9 +1,9 @@
 #include <assert.h>
-#include "optimizator.h"
-#include "tree_funcs.h"
-#include "dmath.h"
-#include "differentiator_funcs.h"
-#include "tex_dump.h"
+#include "../header_files/optimizator.h"
+#include "../header_files/tree_funcs.h"
+#include "../header_files/dmath.h"
+#include "../header_files/differentiator_funcs.h"
+#include "../header_files/tex_dump.h"
 
 static bool wrap_node(tree* tree_ptr, node* current_node);
 static void remove_neutral_elements_from_node(tree* tree_ptr, node* current_node, dir_t branch_dir);

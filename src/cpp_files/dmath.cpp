@@ -1,12 +1,12 @@
-#include "dmath.h"
-#include "differentiator_funcs.h"
 #include <assert.h>
 #include <math.h>
-#include "tex_dump.h"
+#include "../header_files/dmath.h"
+#include "../header_files/differentiator_funcs.h"
+#include "../header_files/tex_dump.h"
 
 
 // TODO - remove excess headers
-// TODO - compare normally 
+// TODO - compare normally
 // TODO - add sqrt
 // TODO - check double for finite values
 

@@ -12,17 +12,34 @@ CPPFLAGS = -g0 -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wc++14-co
 
 BUILD = build
 
-SRCMODULES = tree_funcs.cpp differentiator_funcs.cpp inout_funcs.cpp tree_dump.cpp reader.cpp dmath.cpp optimizator.cpp tex_dump.cpp advanced_reader.cpp
+SRC = src/cpp_files
+
+SRCMODULES = $(addprefix $(SRC)/,tree_funcs.cpp differentiator_funcs.cpp \
+	inout_funcs.cpp tree_dump.cpp reader.cpp dmath.cpp optimizator.cpp \
+	tex_dump.cpp advanced_reader.cpp)
+
+# SRCMODULES = src/cpp_files/tree_funcs.cpp \
+			 # src/cpp_files/differentiator_funcs.cpp \
+			 # src/cpp_files/inout_funcs.cpp \
+			 # src/cpp_files/tree_dump.cpp \
+			 # src/cpp_files/reader.cpp \
+			 # src/cpp_files/dmath.cpp \
+			 # src/cpp_files/optimizator.cpp \
+			 # src/cpp_files/tex_dump.cpp \
+			 # src/cpp_files/advanced_reader.cpp
+
+
 DEBUG_MODULE = debug_lib/debug.cpp
-OBJMODULES = $(addprefix $(BUILD)/,$(SRCMODULES:.cpp=.o)) 
+OBJMODULES = $(addprefix $(BUILD)/,$(notdir $(SRCMODULES:.cpp=.o)))
 DEBUG_OBJ = $(addprefix $(BUILD)/,$(notdir $(DEBUG_MODULE:.cpp=.o)))
 
 all: $(BUILD) $(BUILD)/differntiator 
 
-$(BUILD)/differntiator: main.cpp $(OBJMODULES) $(DEBUG_OBJ)
+$(BUILD)/differntiator: src/cpp_files/main.cpp $(OBJMODULES) $(DEBUG_OBJ)
+	echo SUDA BLYAT $(OBJMODULES)
 	$(CPP) $(CPPFLAGS) $^ -o $@
 
-$(BUILD)/%.o: %.cpp
+$(BUILD)/%.o: $(SRC)/%.cpp
 	$(CPP) $(CPPFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: debug_lib/%.cpp

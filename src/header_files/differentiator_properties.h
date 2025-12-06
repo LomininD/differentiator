@@ -26,7 +26,7 @@ enum diff_ops // FIXME - remove
 	op_count
 };
 
-#include "debug_lib/debug.h"
+#include "../../debug_lib/debug.h"
 #include "tree_properties.h"
 
 #define FORMULA_FILE_NAME "formula.txt" // TODO - remake as command line argument
