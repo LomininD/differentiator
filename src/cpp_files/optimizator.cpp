@@ -34,13 +34,13 @@ err_t wrap_constants(tree* tree_ptr) // TODO - check return value EVERYWHERE
 {
 	assert(tree_ptr != NULL);
 	
-	printf_debug_msg("wrap_constants: began process\n");
+	//printf_debug_msg("wrap_constants: began process\n");
 	VERIFY_TREE(tree_ptr, error);
 
 	wrap_node(tree_ptr, tree_ptr->root);
 
 	VERIFY_TREE(tree_ptr, error);
-	printf_debug_msg("wrap_constants: finished process\n");
+	//printf_debug_msg("wrap_constants: finished process\n");
 
 	print_tree_dump(tree_ptr, "Wrapped tree view\n");
 
@@ -52,7 +52,7 @@ bool wrap_node(tree* tree_ptr, node* current_node)
 {
 	assert(tree_ptr != NULL);
 
-	printf_debug_msg("wrap_node: wraping %p\n", current_node);
+	//printf_debug_msg("wrap_node: wraping %p\n", current_node);
 
 	if (current_node == NULL)
 		return false;
@@ -89,7 +89,7 @@ bool wrap_node(tree* tree_ptr, node* current_node)
 
 	tree_ptr->size -= destroyed_nodes;
 
-	printf_debug_msg("wrap_node: done wrapping %p\n", current_node);
+	//printf_debug_msg("wrap_node: done wrapping %p\n", current_node);
 
 	return false;
 }
@@ -117,7 +117,7 @@ void remove_neutral_elements_from_node(tree* tree_ptr, node* current_node, dir_t
 {
 	assert(tree_ptr != NULL);
 
-	printf_debug_msg("remove_neutral_elements_from_node: checking %p\n", current_node);
+	//printf_debug_msg("remove_neutral_elements_from_node: checking %p\n", current_node);
 
 	if (current_node == NULL) return;
 

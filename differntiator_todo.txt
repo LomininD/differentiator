@@ -1,16 +1,10 @@
 // TODO - add other function derivatives (dont forget about neutral elements)
-// TODO - dump in tex
-// TODO - name table
 // TODO - count equation 
-// TODO - partial dump
-// TODO - full derivative
 // TODO - tailor polinomial 
-// TODO - graph of each equation 
-// TODO - ask all required data, execute all procedures in complex (remake user interface)
-// TODO - check math errors 
+// TODO - total graph 
+// TODO - give file as an input with information about equation 
 // TODO - complete all todos
 // TODO - complete all todos from notebook 
-// TODO - add reader 
 // TODO - (optionally) - advertisements 
 // TODO - check for math errors
 

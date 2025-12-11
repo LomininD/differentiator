@@ -146,7 +146,7 @@ size_t destroy_node(node* node)
         nodes_destroyed += destroy_node(node->right); // TODO - if we have char* consider freeing it
     }
 
-    printf_debug_msg("deleting %p\n", node);
+    //printf_debug_msg("deleting %p\n", node);
 
     free(node);
 

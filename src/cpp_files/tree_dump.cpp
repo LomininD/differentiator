@@ -146,7 +146,6 @@ void print_tree_dump(const tree* tree, const char* format, ...)
     printf_debug_msg("\terr_stat   =  %d (0 - no_error, 1 - error)\n", tree->err_stat);
     printf_debug_msg("\tsize       =  %zu\n\n", tree->size);
 
-
     printf_log_bold("=========================================================\n\n", NULL);
 
     generate_dump_image(tree);
@@ -155,8 +154,8 @@ void print_tree_dump(const tree* tree, const char* format, ...)
     #endif
 }
 
-#define FPRINT(...) fprintf(fp, __VA_ARGS__)
 
+#define FPRINT(...) fprintf(fp, __VA_ARGS__)
 
 void dump_name_table()
 {
@@ -167,7 +166,6 @@ void dump_name_table()
     }
     printf_debug_msg("-------------------------------\n\n");
 }
-
 
 // generates tree graph and puts in html log file
 void generate_dump_image(const tree* tree)
