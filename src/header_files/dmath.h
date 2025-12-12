@@ -48,7 +48,8 @@ double calc_arcsin(double a, double b);
 double calc_arccos(double a, double b);
 
 bool rm_mul_node    (tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
-bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
+bool rm_add_node	(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
+bool rm_sub_node	(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
 bool rm_div_node    (tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
 bool rm_pow_node    (tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);
 bool rm_ln_node     (tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir);

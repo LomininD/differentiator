@@ -18,7 +18,7 @@ static void dump_vars();
 static void dump_var_values();
 static size_t count_nodes(node* node_ptr);
 
-const size_t max_nodes_displayed = 50;
+const size_t max_nodes_displayed = 45;
 node* replacements[26] = {};
 int replaced = 0;
 
@@ -201,6 +201,16 @@ void dump_start_of_differentiation(node* node_ptr, char diff_var)
 	FPRINT("\\frac{d}{d%c} \\left( ", diff_var);
 	dump_node(node_ptr);
 	FPRINT("\\right)");
+}
+
+void fill_tangent_preamble()
+{
+	FPRINT("\\pagebreak\n");
+	FPRINT("\\section{Расчет касательной}\n\n");
+	FPRINT("Теперь найдём касательную к графику в точке:\n\n");
+	FPRINT("\\begin{dmath*}[spread=10pt]\n");
+	FPRINT("y_{\\text{кас}} = y(x_0) + y'(x_0)(x-x_0)\n");
+	FPRINT("\\end{dmath*}\n\n");
 }
 
 void dump_intermediate_calculations(node* node_ptr)

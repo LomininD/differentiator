@@ -34,32 +34,11 @@ int main()
 
     process_calculating_value(main_tree_ptr->root);
 
-
-    // calculate_tree() // should require only tree and be able to be placed in any part of program
-
-
     fill_derivative_preamble();
 
     process_calculating_partial_derivative(main_tree_ptr);
 
-    //bool end = false;
-//     while(!end)
-//     {
-//         print_menu();
-// 
-//         cmd_t current_cmd = get_cmd();
-//         err_t executed = ok;
-// 
-//         switch (current_cmd)
-//         {
-//             case calculate_partial_derivative:
-//                 executed = process_calculating_partial_derivative(main_tree_ptr);
-//                 break;
-//             case quit:
-//                 end = true;
-//                 break;
-//         };
-//     }
+    fill_tangent_preamble();
     
     close_tex_file();
     convert_to_pdf();

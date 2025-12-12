@@ -17,6 +17,8 @@ void dump_end_of_differentiation();
 void dump_text(const char* format, ...);
 void insert_random_phrase();
 
+void fill_tangent_preamble();
+
 void close_tex_file();
 void convert_to_pdf();
 

@@ -10,8 +10,8 @@
 // TODO - add sqrt
 // TODO - check double for finite values
 
-diff_op_t possible_ops[] = {{"+",      ADD,    differentiate_add,    calc_add,     rm_add_sub_node,	  dump_add_sub},
-							{"-",      SUB,    differentiate_sub,    calc_sub,     rm_add_sub_node,   dump_add_sub},
+diff_op_t possible_ops[] = {{"+",      ADD,    differentiate_add,    calc_add,     rm_add_node,	  dump_add_sub},
+							{"-",      SUB,    differentiate_sub,    calc_sub,     rm_sub_node,   dump_add_sub},
 							{"*",      MUL,    differentiate_mul,    calc_mul,     rm_mul_node,		  dump_mul},
 							{"/",      DIV,    differentiate_div,    calc_div,     rm_div_node,		  dump_div},
 							{"^",      POW,    differentiate_pow,    calc_pow,     rm_pow_node, 	  dump_pow},
@@ -347,12 +347,14 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	return false;
 }
 
+//FIXME - 0 - x^2/2 - wrong optimization
 
-bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+bool rm_add_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
 {
 	ASSERT_ARGS;
 
-	printf_debug_msg("rm_add_sub_node: current_node = %p, normal_node = %p, neutral_node = %p\n", current_node, *normal_node, *neutral_node);
+	printf_debug_msg("rm_add_node: current_node = %p, normal_node = %p, neutral_node = %p\n", 
+													current_node, *normal_node, *neutral_node);
 
 	CHECK_TYPE(NUM);
 
@@ -366,7 +368,36 @@ bool rm_add_sub_node(tree* tree_ptr, node* current_node, node** normal_node, nod
 		*normal_node = NULL;
 
 		CLEAR_NODES;
-		printf_debug_msg("rm_add_sub_node: removed neutral elements of %p \n", current_node);
+		printf_debug_msg("rm_add_node: removed neutral elements of %p \n", current_node);
+		return true;
+	}
+	return false;
+}
+
+
+bool rm_sub_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
+{
+	ASSERT_ARGS;
+
+	printf_debug_msg("rm_add_sub_node: current_node = %p, normal_node = %p, neutral_node = %p\n", 
+													current_node, *normal_node, *neutral_node);
+
+	CHECK_TYPE(NUM);
+	printf("%p branch dir is %d\n", current_node, branch_dir);
+
+	if (*neutral_node == current_node->left) return false;
+
+	if (VAL_IS(0))
+	{
+		if (branch_dir == left) 		PARENT_NODE->left  = *normal_node;
+		else if (branch_dir == right)   PARENT_NODE->right = *normal_node;
+		else 							tree_ptr->root = *normal_node;
+
+		(*normal_node)->parent = PARENT_NODE;
+		*normal_node = NULL;
+
+		CLEAR_NODES;
+		printf_debug_msg("rm_sub_node: removed neutral elements of %p \n", current_node);
 		return true;
 	}
 	return false;

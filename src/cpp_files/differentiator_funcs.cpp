@@ -30,9 +30,6 @@ void print_menu()
 }
 
 
-
-
-
 void ask_for_variable_values()
 {
 	for (int i = 0; i < name_table_size; i++)
@@ -384,5 +381,11 @@ bool check_for_diff_var(node* current_node_ptr, char diff_var)
 int hash_var(char var)
 {
 	return var - 'a';
+}
+
+
+void shut_down_differentiator()
+{
+	return;
 }
 
