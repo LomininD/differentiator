@@ -111,13 +111,8 @@ node* get_number(char** text_buf, size_t* tree_size)
 		{
 			after_floating_point++;
 			val = val + (double) (**text_buf - '0') / pow(10.0, after_floating_point);
-			printf("%lg\n", val);
 		}
-		else 
-		{
-			val = val * 10.0 + (double) (**text_buf - '0');
-			printf("%lg\n", val);
-		}
+		else val = val * 10.0 + (double) (**text_buf - '0');
 
 		(*text_buf)++; 
 		num_len++;

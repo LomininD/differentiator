@@ -2,7 +2,7 @@
 #define DIFFERENTIATOR_PROPERTIES_H
 
 // Turn off in release version:
-#define HTML_DEBUG_MODE  // FIXME - solve define problem
+//#define HTML_DEBUG_MODE  // FIXME - solve define problem
 #define TREE_VERIFICATION
 //#define ADVERTISEMENTS
 

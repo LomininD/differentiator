@@ -221,7 +221,7 @@ err_t process_number(node* new_node, double number, const char* end_of_str)
 			return error;
 		}
 
-		printf("%c\n", *(end_of_str + 1));
+		//printf("%c\n", *(end_of_str + 1));
 
 		if (*end_of_str != '\0')
 		{

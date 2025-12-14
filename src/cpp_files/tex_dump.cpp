@@ -8,12 +8,14 @@
 
 // TODO - fix issue with extra pars in d/dx()
 // TODO - replace vars with numbers
+// TODO - make functions universal
+// TODO - address all warnings
 
 FILE* tex_ptr = NULL;
 const char* output_file_name = "output.tex";
 const char* open_file_cmd = "open output.pdf";
 
-static void dump_node(node* node_ptr);
+void dump_node(node* node_ptr, bool replace_vars);
 static void dump_vars();
 static void dump_var_values();
 static size_t count_nodes(node* node_ptr);
@@ -74,7 +76,7 @@ void fill_main_equation_preamble(tree* tree_ptr)
 	FPRINT("f\\left( ");
 	dump_vars();
 	FPRINT("\\right) = ");
-	dump_node(tree_ptr->root);
+	dump_node(tree_ptr->root, false);
 }
 
 void dump_vars()
@@ -105,7 +107,7 @@ void dump_replacements()
 		{
 			FPRINT("\\begin{dmath*}[spread=10pt]\n");
 			FPRINT("\\text{Где} \\quad \\mathfrak{%c} = ", 'A' + i);
-			dump_node(replacements[i]);
+			dump_node(replacements[i], false);
 			FPRINT("\\end{dmath*}\n");
 		}
 		replaced = 0;
@@ -121,7 +123,13 @@ void dump_calculating_expression_value(node* node_ptr, double value)
 
 	FPRINT("\\begin{dmath*}\n");
 
-	dump_node(node_ptr);
+	printf("DUMPING WITH VARS\n");
+	dump_node(node_ptr, false);
+
+	FPRINT("= ");
+
+	printf("DUMPING WITHOUT VARS\n");
+	dump_node(node_ptr, true);
 
 	FPRINT("= %lg\n", value);
 
@@ -156,10 +164,12 @@ size_t count_nodes(node* node_ptr)
 	return count;
 }
 
+#include "../header_files/tree_dump.h"
 #define CUR_OP node_ptr->data.operation
 #define PARENT_OP node_ptr->parent->data.operation
+#define DATA node_ptr->data
 
-void dump_node(node* node_ptr)
+void dump_node(node* node_ptr, bool replace_vars)
 {
 	assert(node_ptr != NULL);
 
@@ -168,26 +178,28 @@ void dump_node(node* node_ptr)
 	switch(node_ptr->type)
 	{
 		case NUM:
-			if (node_ptr->data.number < 0 && (node_ptr->parent != NULL && PARENT_OP != DIV)) need_p = true;
+			if (DATA.number < 0 && (node_ptr->parent != NULL && PARENT_OP != DIV)) need_p = true;
 			if (need_p) FPRINT("\\left( ");
-			FPRINT("%lg ", node_ptr->data.number);
+			FPRINT("%lg ", DATA.number);
 			if (need_p) FPRINT("\\right) ");
 			break;
 		case VAR:
-			FPRINT("%c ", node_ptr->data.variable);
+			if (replace_vars) FPRINT("%g ", name_table[hash_var(DATA.variable)].value);
+			else FPRINT("%c ", DATA.variable);
 			break;
 		case OP:
 			for(int i = 0; i < op_count; i++)
 			{
-				if (node_ptr->data.operation == possible_ops[i].op)
+				if (DATA.operation == possible_ops[i].op)
 				{
 					//printf_debug_msg("OPERATION: %d\n", node_ptr->data.operation);
-					(*(possible_ops[i].tex_dump_func))(node_ptr, &(possible_ops[i]));
+					(*(possible_ops[i].tex_dump_func))(node_ptr, &(possible_ops[i]), replace_vars);
 				}
 			}
 	};
 }
 
+#undef DATA
 
 void fill_derivative_preamble()
 {
@@ -199,7 +211,7 @@ void dump_start_of_differentiation(node* node_ptr, char diff_var)
 {
 	FPRINT("\\begin{dmath*}[spread=10pt]\n");
 	FPRINT("\\frac{d}{d%c} \\left( ", diff_var);
-	dump_node(node_ptr);
+	dump_node(node_ptr, false);
 	FPRINT("\\right)");
 }
 
@@ -216,10 +228,10 @@ void fill_tangent_preamble()
 void dump_intermediate_calculations(node* node_ptr)
 {
 	FPRINT("= ");
-	dump_node(node_ptr);
+	dump_node(node_ptr, false);
 }
 
-void dump_end_of_differentiation()
+void dump_end_of_differentiation() // make more universal
 {
 	FPRINT("\n\\end{dmath*}\n\n");
 	dump_replacements();
@@ -241,7 +253,7 @@ void insert_random_phrase()
 	int ind = (int)(normalized * (double)(sizeof(phrase_bank) / (double)sizeof(const char*)));
 
 	FPRINT("%s \\\\ \n\n", phrase_bank[ind]);
-	printf("%d\n", ind);
+	//printf("%d\n", ind);
 }
 
 void close_tex_file()
@@ -250,14 +262,14 @@ void close_tex_file()
 	fclose(tex_ptr);
 }
 
-// TODO - change long expr with letters
+
 //----------------------------------------- DUMP OPERATIONS -------------------------------------------
 
 #define OPEN_PAR  if (need_p) FPRINT("\\left( ")
 #define CLOSE_PAR if (need_p) FPRINT("\\right) ")
 #define CHECK_FOR_OUTER_PARS if (node_ptr->parent == NULL) need_p = false
 
-void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
+void dump_add_sub(node* node_ptr, diff_op_t* op_struct, bool replace_vars)
 {
 	bool need_p = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
@@ -267,35 +279,32 @@ void dump_add_sub(node* node_ptr, diff_op_t* op_struct)
 									 node_ptr == node_ptr->parent->left))) need_p = true;
 
 	OPEN_PAR;
-	dump_node(node_ptr->left);
+	dump_node(node_ptr->left, replace_vars);
 	FPRINT("%s ", op_struct->name);
-	dump_node(node_ptr->right);
+	dump_node(node_ptr->right, replace_vars);
 	CLOSE_PAR;
 }
 
 
-void dump_mul(node* node_ptr, diff_op_t* op_struct)
+void dump_mul(node* node_ptr, diff_op_t* op_struct, bool replace_vars) // FIXME pay attention here if dump is incorrect
 {
-	bool need_p = true;
+	bool need_p = false;
 	//bool need_dot = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
-								 && (PARENT_OP == MUL || 
-								 	 PARENT_OP == ADD || 
-									 PARENT_OP == SUB ||
-									 PARENT_OP == DIV)) need_p = false;
+								 && (PARENT_OP == POW)) need_p = true;
 
 	// if (node_ptr->right->type == NUM || 
 	// 			(node_ptr->right->data.operation == MUL && 
 	// 							node_ptr->right->left->type == NUM)) need_dot = true;
 	CHECK_FOR_OUTER_PARS;
 	OPEN_PAR;
-	dump_node(node_ptr->left);
+	dump_node(node_ptr->left, replace_vars);
 	FPRINT("\\cdot ");
-	dump_node(node_ptr->right);
+	dump_node(node_ptr->right, replace_vars);
 	CLOSE_PAR;
 }
 
-void dump_div(node* node_ptr, diff_op_t* op_struct)
+void dump_div(node* node_ptr, diff_op_t* op_struct, bool replace_vars)
 {
 	bool need_p = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
@@ -313,7 +322,7 @@ void dump_div(node* node_ptr, diff_op_t* op_struct)
 	}
 	else
 	{
-		dump_node(node_ptr->left);
+		dump_node(node_ptr->left, replace_vars);
 	}
 
 	FPRINT("}{ ");
@@ -327,14 +336,14 @@ void dump_div(node* node_ptr, diff_op_t* op_struct)
 	}
 	else
 	{
-		dump_node(node_ptr->right);
+		dump_node(node_ptr->right, replace_vars);
 	}
 
 	FPRINT("} ");
 	CLOSE_PAR;
 }
 
-void dump_unary_func(node* node_ptr, diff_op_t* op_struct)
+void dump_unary_func(node* node_ptr, diff_op_t* op_struct, bool replace_vars)
 {
 	bool need_p = false;
 	bool func_needs_p = false;
@@ -345,22 +354,22 @@ void dump_unary_func(node* node_ptr, diff_op_t* op_struct)
 	FPRINT("\\%s{ ", op_struct->name);
 
 	OPEN_PAR;
-	dump_node(node_ptr->right);
+	dump_node(node_ptr->right, replace_vars);
 	CLOSE_PAR;
 
 	FPRINT("} ");
 	if (func_needs_p) FPRINT("\\right) ");
 }
 
-void dump_pow(node* node_ptr, diff_op_t* op_struct)
+void dump_pow(node* node_ptr, diff_op_t* op_struct, bool replace_vars)
 {
 	bool need_p = false;
 	if (node_ptr->parent != NULL && node_ptr->parent->type == OP 
 								 && (PARENT_OP == POW)) need_p = true;
 	OPEN_PAR;
-	dump_node(node_ptr->left);
+	dump_node(node_ptr->left, replace_vars);
 	FPRINT("^{ ");
-	dump_node(node_ptr->right);
+	dump_node(node_ptr->right, replace_vars);
 	FPRINT("} ");
 	CLOSE_PAR;
 }
@@ -371,10 +380,12 @@ void dump_pow(node* node_ptr, diff_op_t* op_struct)
 #undef FPRINT
 #undef CUR_OP
 
+//------------------------------------------------------------------------------------------------
+
 void convert_to_pdf()
 {
     char sys_str[sys_str_size] = {};
-    snprintf(sys_str, sys_str_size, "pdflatex  %s ", output_file_name); 
+    snprintf(sys_str, sys_str_size, "pdflatex -interaction=batchmode %s ", output_file_name); 
 	// -interaction=batchmode > /dev/null 2>&1
     //puts(sys_str);
 

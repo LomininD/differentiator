@@ -20,7 +20,6 @@ extern name_record name_table[];
 extern name_record preset_names[];
 
 
-void print_menu();
 void ask_for_variable_values();
 err_t process_calculating_value(node* root_node);
 err_t process_calculating_partial_derivative(tree* tree_ptr);
@@ -33,6 +32,8 @@ bool check_for_diff_var(node* current_node_ptr, char diff_var);
 
 int hash_var(char var);
 bool is_preset(char var);
+
+void shut_down_differentiator();
 
 node* differentiate_number_node(tree* tree_ptr, node* current_node_ptr);
 node* differentiate_var_node(tree* tree_ptr, node* current_node_ptr, char diff_var);

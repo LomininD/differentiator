@@ -23,11 +23,11 @@ void close_tex_file();
 void convert_to_pdf();
 
 
-void dump_add_sub	   (node* node_ptr, diff_op_t* op_struct);
-void dump_mul    	   (node* node_ptr, diff_op_t* op_struct);
-void dump_div	 	   (node* node_ptr, diff_op_t* op_struct);
-void dump_unary_func   (node* node_ptr, diff_op_t* op_struct);
-void dump_pow	 	   (node* node_ptr, diff_op_t* op_struct);
+void dump_add_sub	   (node* node_ptr, diff_op_t* op_struct, bool replace_vars);
+void dump_mul    	   (node* node_ptr, diff_op_t* op_struct, bool replace_vars);
+void dump_div	 	   (node* node_ptr, diff_op_t* op_struct, bool replace_vars);
+void dump_unary_func   (node* node_ptr, diff_op_t* op_struct, bool replace_vars);
+void dump_pow	 	   (node* node_ptr, diff_op_t* op_struct, bool replace_vars);
 
 
 

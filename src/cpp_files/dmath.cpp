@@ -89,8 +89,6 @@ node* differentiate_pow(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	ASSERT_ARGS;
 
-	printf("DIFFERENTIATE NODE\n");
-
 	if (check_for_diff_var(current_node_ptr->left,  diff_var) && 
 		check_for_diff_var(current_node_ptr->right, diff_var))
 	{
@@ -347,7 +345,6 @@ bool rm_mul_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 	return false;
 }
 
-//FIXME - 0 - x^2/2 - wrong optimization
 
 bool rm_add_node(tree* tree_ptr, node* current_node, node** normal_node, node** neutral_node, dir_t branch_dir)
 {
@@ -383,7 +380,6 @@ bool rm_sub_node(tree* tree_ptr, node* current_node, node** normal_node, node** 
 													current_node, *normal_node, *neutral_node);
 
 	CHECK_TYPE(NUM);
-	printf("%p branch dir is %d\n", current_node, branch_dir);
 
 	if (*neutral_node == current_node->left) return false;
 

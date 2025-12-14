@@ -42,7 +42,8 @@ int main()
     
     close_tex_file();
     convert_to_pdf();
-    destroy_tree(main_tree_ptr);
+
+    shut_down_differentiator();
     end_debugging();
     return 0;
 }

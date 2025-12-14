@@ -12,7 +12,7 @@ struct diff_op_t
 	node* (*diff_operation) (tree*, node*, char);
 	double (*math_func) (double a, double b);
 	bool (*optimizator_func) (tree*, node*, node**, node**, dir_t);
-	void (*tex_dump_func) (node*, diff_op_t*);
+	void (*tex_dump_func) (node*, diff_op_t*, bool);
 };
 
 extern diff_op_t possible_ops[];

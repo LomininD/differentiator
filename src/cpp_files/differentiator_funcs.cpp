@@ -11,23 +11,11 @@
 name_record name_table[name_table_size] = {};
 name_record preset_names[preset_names_num] = {{'e', M_E}};
 
+tree* tree_ptr_arr[100] = {};
+
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
 static double calculate_value(node* node_ptr);
 static bool determine_var_value(char var, name_record var_table[], int table_size, double* value);
-
-// TODO - check if entered var is in name table
-
-void print_menu()
-{
-	printf_both("-> Choose a command to execute:\n");
-	printf("- [c]ount (not done yet)\n");
-	printf("- [s]implify (not done yet)\n");
-	printf("- [d]erivative (not done yet)\n");
-	printf("- [p]artial derivative\n");
-	printf("- [g]raph (not done yet)\n");
-	printf("- [t]aylor polynomial (not done yet)\n");
-	printf("- [q]uit\n");
-}
 
 
 void ask_for_variable_values()
@@ -56,6 +44,9 @@ bool is_preset(char var)
 }
 
 
+//================================================================================================
+// CALCULATING VALUE
+
 err_t process_calculating_value(node* root_node)
 {
 	assert(root_node != NULL);
@@ -64,7 +55,7 @@ err_t process_calculating_value(node* root_node)
 	double total_value = calculate_value(root_node);
 	CHECK_ERR(error);
 
-	printf_both("->function value is %lg\n", total_value);
+	printf_both("-> Function value is %lg\n", total_value);
 
 	dump_calculating_expression_value(root_node, total_value);
 
@@ -135,6 +126,10 @@ bool determine_var_value(char var, name_record var_table[], int table_size, doub
 }
 
 
+//================================================================================================
+// CALCULATING DERIVATIVE
+
+
 err_t process_calculating_partial_derivative(tree* tree_ptr)
 {
 	assert(tree_ptr != NULL);
@@ -147,7 +142,6 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 	printf_both("-> Enter number of times to differentiate:\n");
 	int diff_times = (int) request_number();
 
-	tree* tree_ptr_arr[100] = {}; // TODO - make dynamic
 	tree_ptr_arr[0] = tree_ptr;
 
 	for (int i = 1; i <= diff_times; i++)
@@ -157,7 +151,7 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 		tree_ptr_arr[i] = differentiate_tree(tree_ptr_arr[i-1], diff_var);
 		CHECK_ERR(error);
 
-		dump_text("По итогу получаем:\n\n");
+		dump_text("\\textbf{По итогу получаем:}\n\n");
 
 		dump_start_of_differentiation(tree_ptr_arr[i-1]->root, diff_var);
 
@@ -171,17 +165,6 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 		dump_text("Всё, что недосократилось, сократите сами, РУЧКАМИ\n\n");
 	}
 	
-	printf_debug_msg("process_calculating_partial_derivative: cleaning up tree_ptr_arr\n");
-
-	for (int i = 1; i <= diff_times; i++) // TODO - delete in dtor in case user needs to count another derivative
-	{
-		if (tree_ptr_arr[i] != NULL) 
-		{
-			printf_debug_msg("cleaning %p\n", tree_ptr_arr[i]);
-			destroy_tree(tree_ptr_arr[i]); 
-		}
-	}
-
 	printf_debug_msg("process_calculating_partial_derivative: finished process\n");
 	return ok;
 }
@@ -206,13 +189,14 @@ tree* differentiate_tree(const tree* old_tree_ptr, char diff_var)
 	return new_tree_ptr;
 }
 
+
 node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 {
 	assert(tree_ptr != NULL);
 	assert(current_node_ptr != NULL);
 
 	printf_debug_msg("differentiate_node: began process\n");
-	printf("node = %p type = %d (%d)\n", current_node_ptr, current_node_ptr->type, OP);
+	// printf("node = %p type = %d (%d)\n", current_node_ptr, current_node_ptr->type, OP);
 
 	node* diffed_node = NULL;
 
@@ -252,44 +236,17 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 }
 
 
-const char* decode_operation_type_enum(diff_ops op)
+bool check_for_diff_var(node* current_node_ptr, char diff_var)
 {
-    for (int i = 0; i < op_count; i++)
-    {
-		if (op == possible_ops[i].op)
-			return possible_ops[i].name;
-    }
-	return "unknown";
-}
+	if (current_node_ptr == NULL) return false;
 
-
-double calculate_node(tree* tree_ptr, node* current_node) // TODO - work with sin/cos
-{
-	assert(tree_ptr != NULL);
-
-	if (current_node == NULL) return 0;
-
-	if (current_node->type == NUM)
-		return current_node->data.number;
-
-	if (current_node->type == VAR)
+	if (current_node_ptr->type == VAR)
 	{
-		printf_log_err("[from calculate_node] -> cannot calculate variables\n");
-		global_err_stat = error;
-		return -1;
+		if (current_node_ptr->data.variable == diff_var)
+			return true;
 	}
-
-	double res = 0;
-	
-	for (int i = 0; i < op_count; i++)
-	{
-		if (current_node->data.operation == possible_ops[i].op)
-		{
-			res = (*(possible_ops[i].math_func)) (calculate_node(tree_ptr, current_node->left), calculate_node(tree_ptr, current_node->right));
-		}
-	}
-
-	return res;
+	return (check_for_diff_var(current_node_ptr->left,  diff_var) || 
+			check_for_diff_var(current_node_ptr->right, diff_var));
 }
 
 
@@ -364,17 +321,54 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 }
 
 
-bool check_for_diff_var(node* current_node_ptr, char diff_var)
-{
-	if (current_node_ptr == NULL) return false;
+//================================================================================================
+// CALCULATING TANGENT
 
-	if (current_node_ptr->type == VAR)
+
+//void
+
+
+//================================================================================================
+
+
+const char* decode_operation_type_enum(diff_ops op)
+{
+    for (int i = 0; i < op_count; i++)
+    {
+		if (op == possible_ops[i].op)
+			return possible_ops[i].name;
+    }
+	return "unknown";
+}
+
+
+double calculate_node(tree* tree_ptr, node* current_node) // TODO - work with sin/cos
+{
+	assert(tree_ptr != NULL);
+
+	if (current_node == NULL) return 0;
+
+	if (current_node->type == NUM)
+		return current_node->data.number;
+
+	if (current_node->type == VAR)
 	{
-		if (current_node_ptr->data.variable == diff_var)
-			return true;
+		printf_log_err("[from calculate_node] -> cannot calculate variables\n");
+		global_err_stat = error;
+		return -1;
 	}
-	return (check_for_diff_var(current_node_ptr->left,  diff_var) || 
-			check_for_diff_var(current_node_ptr->right, diff_var));
+
+	double res = 0;
+	
+	for (int i = 0; i < op_count; i++)
+	{
+		if (current_node->data.operation == possible_ops[i].op)
+		{
+			res = (*(possible_ops[i].math_func)) (calculate_node(tree_ptr, current_node->left), calculate_node(tree_ptr, current_node->right));
+		}
+	}
+
+	return res;
 }
 
 
@@ -386,6 +380,12 @@ int hash_var(char var)
 
 void shut_down_differentiator()
 {
-	return;
+	printf_debug_msg("shut_down_differentiator: cleaning up tree_ptr_arr\n");
+
+	for (int i = 0; tree_ptr_arr[i] != NULL; i++)
+	{
+		printf_debug_msg("cleaning %p\n", tree_ptr_arr[i]);
+		destroy_tree(tree_ptr_arr[i]); 
+	}
 }
 
