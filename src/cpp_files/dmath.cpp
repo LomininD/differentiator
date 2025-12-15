@@ -45,7 +45,8 @@ diff_op_t possible_ops[] = {{"+",      ADD,    differentiate_add,    calc_add,  
 #define LN_N(NODE)         NON (LN,  NULL, NODE)
 #define SIN_N(NODE)		   NON (SIN, NULL, NODE)
 #define COS_N(NODE)		   NON (COS, NULL, NODE)
-#define COMPOUND_FUNC(EXP, INSIDE_FUNC) NON(MUL, EXP, d(INSIDE_FUNC));
+#define VAR_N(VAR_NAME) create_and_initialise_node(VAR, (union data_t){.variable = VAR_NAME}, NULL, NULL, NULL)
+#define COMPOUND_FUNC(EXP, INSIDE_FUNC) NON(MUL, EXP, d(INSIDE_FUNC))
 #define SIZE tree_ptr->size
 
 
@@ -213,6 +214,28 @@ node* differentiate_arccos(tree* tree_ptr, node* current_node_ptr, char diff_var
 						  R_SUBTR);
 }
 
+// tree_ptr_arr_values
+void make_tangent(tree* tree_ptr_arr[], int* tree_ptr_arr_size, double main_tree_value)
+{
+	assert(tree_ptr_arr != NULL);
+
+	double derivative_value = calculate_value(tree_ptr_arr[1]->root);
+	tree* tangent_tree = tree_ctor();
+
+	tangent_tree->size = 9;
+
+	node* tangent_root = ADD_N (
+							    MUL_N (NUM_N (derivative_value), 
+									   VAR_N('x')),
+								SUB_N (NUM_N (main_tree_value),
+									   MUL_N (NUM_N (derivative_value),
+											  NUM_N (get_variable_val('x')))));	// remove x
+	tangent_tree->root = tangent_root; 
+	
+	tree_ptr_arr[*tree_ptr_arr_size] = tangent_tree;
+	*tree_ptr_arr_size++;
+}
+
 
 #undef ASSERT_ARGS
 #undef d
@@ -235,6 +258,7 @@ node* differentiate_arccos(tree* tree_ptr, node* current_node_ptr, char diff_var
 #undef LN_N
 #undef SIN_N
 #undef COS_N
+#undef VAR_N
 #undef COMPOUND_FUNC
 #undef SIZE
 

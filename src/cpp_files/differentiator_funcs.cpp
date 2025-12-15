@@ -14,8 +14,7 @@ name_record preset_names[preset_names_num] = {{'e', M_E}};
 tree* tree_ptr_arr[100] = {};
 
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
-static double calculate_value(node* node_ptr);
-static bool determine_var_value(char var, name_record var_table[], int table_size, double* value);
+static bool determine_preset_value(char var, name_record var_table[], int table_size, double* value);
 
 
 void ask_for_variable_values()
@@ -47,7 +46,7 @@ bool is_preset(char var)
 //================================================================================================
 // CALCULATING VALUE
 
-err_t process_calculating_value(node* root_node)
+err_t process_calculating_value(node* root_node, double* value)
 {
 	assert(root_node != NULL);
 	printf_debug_msg("process_calculating_value: began process\n");
@@ -59,28 +58,31 @@ err_t process_calculating_value(node* root_node)
 
 	dump_calculating_expression_value(root_node, total_value);
 
+	*value = total_value;
+
 	printf_debug_msg("process_calculating_value: finished process\n");
 
 	return ok;
 }
 
 #define TYPE node_ptr->type
+#define DATA node_ptr->data
 
 double calculate_value(node* node_ptr)
 {
 	if (node_ptr == NULL) return ok;
 
-	if (TYPE == NUM) return node_ptr->data.number;
+	if (TYPE == NUM) return DATA.number;
 
 	bool found_var = false;
 	double value = 0;
 
 	if (TYPE == VAR)
 	{
-		found_var = determine_var_value(node_ptr->data.variable, preset_names, preset_names_num, &value);
+		found_var = determine_preset_value(DATA.variable, preset_names, preset_names_num, &value);
 		if (found_var) return value;
 		
-		found_var = determine_var_value(node_ptr->data.variable, name_table, name_table_size, &value);
+		found_var = get_variable_val(DATA.variable);
 		if (found_var) return value;
 		else
 		{
@@ -99,7 +101,7 @@ double calculate_value(node* node_ptr)
 
 		for (int i = 0; i < op_count; i++)
 		{
-			if (node_ptr->data.operation == possible_ops[i].op)
+			if (DATA.operation == possible_ops[i].op)
 			{
 				return (*possible_ops[i].math_func)(left_val, right_val);
 			}
@@ -110,9 +112,10 @@ double calculate_value(node* node_ptr)
 }
 
 #undef TYPE
+#undef DATA
 
 
-bool determine_var_value(char var, name_record var_table[], int table_size, double* value)
+bool determine_preset_value(char var, name_record var_table[], int table_size, double* value)
 {
 	for (int i = 0; i < table_size; i++)
 	{
@@ -325,7 +328,24 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 // CALCULATING TANGENT
 
 
-//void
+tree* process_calculating_tangent(tree* tree_ptr, char var)
+{
+	assert(tree_ptr != NULL);
+
+	printf_debug_msg("process_calculating_tangent: began process\n");
+
+	node* sum_node = create_and_initialise_node(OP, (union data_t){.operation = ADD}, NULL, NULL, NULL);
+	node* y_x0_node = create_and_initialise_node(NUM, (union data_t){.number = 0}, NULL, NULL, NULL);
+	node* mul_node = create_and_initialise_node(OP, (union data_t){.operation = MUL}, NULL, NULL, NULL);
+	node* sub_node = create_and_initialise_node(OP, (union data_t){.operation = SUB}, NULL, NULL, NULL);
+	node* x_node = create_and_initialise_node(VAR, (union data_t){.variable = var}, NULL, NULL, NULL);
+	node* x0_node = create_and_initialise_node(NUM, (union data_t){.number = 0}, NULL, NULL, NULL);
+	// do DSL or in dmath
+	// make pars
+
+
+	printf_debug_msg("process_calculating_tangent: finished process\n");
+}
 
 
 //================================================================================================
@@ -375,6 +395,18 @@ double calculate_node(tree* tree_ptr, node* current_node) // TODO - work with si
 int hash_var(char var)
 {
 	return var - 'a';
+}
+
+
+double get_variable_val(char var)
+{
+	int ind = hash_var(var);
+	if (ind < 0 || ind > name_table_size)
+	{
+		printf_log_err("get_variable_var: cannot find the requested variable\n");
+		return NAN;
+	}
+	return name_table[ind].value;
 }
 
 

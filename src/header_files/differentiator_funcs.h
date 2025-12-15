@@ -21,7 +21,8 @@ extern name_record preset_names[];
 
 
 void ask_for_variable_values();
-err_t process_calculating_value(node* root_node);
+err_t process_calculating_value(node* root_node, double* value);
+double get_variable_val(char var);
 err_t process_calculating_partial_derivative(tree* tree_ptr);
 node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var);
 const char* decode_operation_type_enum(diff_ops op);
@@ -32,6 +33,8 @@ bool check_for_diff_var(node* current_node_ptr, char diff_var);
 
 int hash_var(char var);
 bool is_preset(char var);
+
+double calculate_value(node* node_ptr);
 
 void shut_down_differentiator();
 

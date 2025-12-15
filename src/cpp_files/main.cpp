@@ -13,6 +13,7 @@ int main()
     initialize_log("differentiator_log.html", "DIFFERENTIATOR LOG");
     initialise_tex_file();
 
+
     tree* main_tree_ptr = tree_ctor();
     if (global_err_stat != ok) return 0;
 
@@ -32,7 +33,9 @@ int main()
 
     dump_name_table();
 
-    process_calculating_value(main_tree_ptr->root);
+    double main_tree_value = 0;
+    
+    process_calculating_value(main_tree_ptr->root, &main_tree_value);
 
     fill_derivative_preamble();
 
