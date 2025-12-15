@@ -13,7 +13,7 @@ void dump_replacements();
 void fill_derivative_preamble();
 void dump_start_of_differentiation(node* node_ptr, char diff_var);
 void dump_intermediate_calculations(node* node_ptr);
-void dump_end_of_differentiation();
+void dump_end_of_equation();
 void dump_text(const char* format, ...);
 void insert_random_phrase();
 

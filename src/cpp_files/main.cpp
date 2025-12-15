@@ -6,6 +6,8 @@
 #include "../header_files/advanced_reader.h"
 #include "../header_files/tex_dump.h"
 
+// move all globals here, make one var availible, make arr of derivative values with replacements 
+
 #define USE_ADVANCED_READER
 
 int main()
@@ -37,11 +39,15 @@ int main()
     
     process_calculating_value(main_tree_ptr->root, &main_tree_value);
 
+    printf("tree value: %g\n", main_tree_value);
+
     fill_derivative_preamble();
 
     process_calculating_partial_derivative(main_tree_ptr);
 
     fill_tangent_preamble();
+
+    process_calculating_tangent(main_tree_ptr, main_tree_value);
     
     close_tex_file();
     convert_to_pdf();

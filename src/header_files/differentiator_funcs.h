@@ -36,6 +36,8 @@ bool is_preset(char var);
 
 double calculate_value(node* node_ptr);
 
+void process_calculating_tangent(tree* tree_ptr, double main_tree_value);
+
 void shut_down_differentiator();
 
 node* differentiate_number_node(tree* tree_ptr, node* current_node_ptr);

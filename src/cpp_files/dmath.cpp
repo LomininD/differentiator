@@ -215,7 +215,7 @@ node* differentiate_arccos(tree* tree_ptr, node* current_node_ptr, char diff_var
 }
 
 // tree_ptr_arr_values
-void make_tangent(tree* tree_ptr_arr[], int* tree_ptr_arr_size, double main_tree_value)
+void make_tangent(tree* tree_ptr_arr[], int* tree_ptr_arr_ind, double main_tree_value)
 {
 	assert(tree_ptr_arr != NULL);
 
@@ -231,9 +231,19 @@ void make_tangent(tree* tree_ptr_arr[], int* tree_ptr_arr_size, double main_tree
 									   MUL_N (NUM_N (derivative_value),
 											  NUM_N (get_variable_val('x')))));	// remove x
 	tangent_tree->root = tangent_root; 
+
+	print_tree_dump(tangent_tree, "Raw tangent tree view\n");
+	dump_intermediate_calculations(tangent_root);
+
+	optimize_equation(tangent_tree);
+	printf("%d\n", *tree_ptr_arr_ind);
 	
-	tree_ptr_arr[*tree_ptr_arr_size] = tangent_tree;
-	*tree_ptr_arr_size++;
+	tree_ptr_arr[*tree_ptr_arr_ind] = tangent_tree;
+	*tree_ptr_arr_ind++;
+
+	VERIFY_TREE(tangent_tree,);
+	print_tree_dump(tangent_tree, "Tangent tree view\n");
+	dump_end_of_equation();
 }
 
 

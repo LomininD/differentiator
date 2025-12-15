@@ -11,6 +11,7 @@
 name_record name_table[name_table_size] = {};
 name_record preset_names[preset_names_num] = {{'e', M_E}};
 
+int tree_ptr_arr_ind = 0;
 tree* tree_ptr_arr[100] = {};
 
 static tree* differentiate_tree(const tree* old_tree_ptr, char diff_var);
@@ -163,9 +164,11 @@ err_t process_calculating_partial_derivative(tree* tree_ptr)
 
 		optimize_equation(tree_ptr_arr[i]);
 
-		dump_end_of_differentiation();
+		dump_end_of_equation();
 
 		dump_text("Всё, что недосократилось, сократите сами, РУЧКАМИ\n\n");
+
+		tree_ptr_arr_ind++;
 	}
 	
 	printf_debug_msg("process_calculating_partial_derivative: finished process\n");
@@ -229,7 +232,7 @@ node* differentiate_node(tree* tree_ptr, node* current_node_ptr, char diff_var)
 	{
 		dump_start_of_differentiation(current_node_ptr, diff_var);
 		dump_intermediate_calculations(diffed_node);
-		dump_end_of_differentiation();
+		dump_end_of_equation();
 		insert_random_phrase();
 	}
 
@@ -328,21 +331,13 @@ node* differentiate_op_node(tree* tree_ptr, node* current_node_ptr, char diff_va
 // CALCULATING TANGENT
 
 
-tree* process_calculating_tangent(tree* tree_ptr, char var)
+void process_calculating_tangent(tree* tree_ptr, double main_tree_value)
 {
 	assert(tree_ptr != NULL);
 
 	printf_debug_msg("process_calculating_tangent: began process\n");
 
-	node* sum_node = create_and_initialise_node(OP, (union data_t){.operation = ADD}, NULL, NULL, NULL);
-	node* y_x0_node = create_and_initialise_node(NUM, (union data_t){.number = 0}, NULL, NULL, NULL);
-	node* mul_node = create_and_initialise_node(OP, (union data_t){.operation = MUL}, NULL, NULL, NULL);
-	node* sub_node = create_and_initialise_node(OP, (union data_t){.operation = SUB}, NULL, NULL, NULL);
-	node* x_node = create_and_initialise_node(VAR, (union data_t){.variable = var}, NULL, NULL, NULL);
-	node* x0_node = create_and_initialise_node(NUM, (union data_t){.number = 0}, NULL, NULL, NULL);
-	// do DSL or in dmath
-	// make pars
-
+	make_tangent(tree_ptr_arr, &tree_ptr_arr_ind, main_tree_value);
 
 	printf_debug_msg("process_calculating_tangent: finished process\n");
 }

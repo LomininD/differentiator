@@ -184,7 +184,7 @@ void dump_node(node* node_ptr, bool replace_vars)
 			if (need_p) FPRINT("\\right) ");
 			break;
 		case VAR:
-			if (replace_vars) FPRINT("%g ", name_table[hash_var(DATA.variable)].value);
+			if (replace_vars) FPRINT("%g ", get_variable_val(DATA.variable));
 			else FPRINT("%c ", DATA.variable);
 			break;
 		case OP:
@@ -222,7 +222,6 @@ void fill_tangent_preamble()
 	FPRINT("Теперь найдём касательную к графику в точке:\n\n");
 	FPRINT("\\begin{dmath*}[spread=10pt]\n");
 	FPRINT("y_{\\text{кас}} = y(x_0) + y'(x_0)(x-x_0)\n");
-	FPRINT("\\end{dmath*}\n\n");
 }
 
 void dump_intermediate_calculations(node* node_ptr)
@@ -231,7 +230,7 @@ void dump_intermediate_calculations(node* node_ptr)
 	dump_node(node_ptr, false);
 }
 
-void dump_end_of_differentiation() // make more universal
+void dump_end_of_equation() // make more universal
 {
 	FPRINT("\n\\end{dmath*}\n\n");
 	dump_replacements();
